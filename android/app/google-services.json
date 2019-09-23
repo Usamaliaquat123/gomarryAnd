@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "741452477547",
+    "firebase_url": "https://gomarry-app.firebaseio.com",
+    "project_id": "gomarry-app",
+    "storage_bucket": "gomarry-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741452477547:android:9da386c069cebef6",
+        "android_client_info": {
+          "package_name": "com.gomarry"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "741452477547-g3m2a9i4ct1j1177lpif0i2jv23915gc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXJ80VJXJh26s1eyqD1wAHwtmdx_NfC5A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "741452477547-g3m2a9i4ct1j1177lpif0i2jv23915gc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "741452477547-a5ho3iqghomuphpubg18mgtmfae0kslk.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gomarry.Mobile"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
