@@ -1,5 +1,5 @@
 const colors = {
-  mainAppColor: "#FF2D55",
+  mainAppColor: "#FF1919",
   secondaryColor: "#9B9B9B",
   textColor: "aliceblue",
   black: "#262626",

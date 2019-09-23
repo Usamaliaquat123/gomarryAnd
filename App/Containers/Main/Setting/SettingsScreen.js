@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, {Component} from 'react';
 import {
   BackHandler,
   TouchableOpacity,
@@ -6,29 +6,29 @@ import {
   Dimensions,
   View,
   Text,
-  ToastAndroid
-} from "react-native";
-import { TabView } from "react-native-tab-view";
-import AsyncStorage from "@react-native-community/async-storage";
-import { NavigationActions } from "react-navigation";
-import moment from "moment";
+} from 'react-native';
+import Toast from 'react-native-root-toast';
 
-import { Card } from "react-native-elements";
-import LinearGradient from "react-native-linear-gradient";
+import {TabView} from 'react-native-tab-view';
+import AsyncStorage from '@react-native-community/async-storage';
+import moment from 'moment';
+
+import {Card} from 'react-native-elements';
+import LinearGradient from 'react-native-linear-gradient';
 import Dialog, {
   DialogContent,
   DialogTitle,
   DialogFooter,
-  DialogButton
-} from "react-native-popup-dialog";
-import Api from "../../../Services/Api";
-import PasswordInputText from "../../../Components/PasswordInput/PasswordInput";
-import ActivityOverlay from "../../../Components/ActivityOverlay";
-import CommonHeaderBack from "../../../Components/CommonHeaderBack";
+  DialogButton,
+} from 'react-native-popup-dialog';
+import Api from '../../../Services/Api';
+import PasswordInputText from '../../../Components/PasswordInput/PasswordInput';
+import ActivityOverlay from '../../../Components/ActivityOverlay';
+import CommonHeaderBack from '../../../Components/CommonHeaderBack';
 // Styles
-import Styles from "./SettingsScreenStyle";
-import { Colors } from "../../../Themes";
-import { ScrollView } from "react-native-gesture-handler";
+import Styles from './SettingsScreenStyle';
+import {Colors} from '../../../Themes';
+import {ScrollView} from 'react-native-gesture-handler';
 
 export default class SettingsScreen extends Component {
   constructor(props) {
@@ -37,75 +37,96 @@ export default class SettingsScreen extends Component {
     this.state = {
       index: 0,
       routes: [
-        { key: "Account", title: "Account" },
-        { key: "Membership", title: "Membership" },
-        { key: "Notification", title: "Notification" }
+        {key: 'Account', title: 'Account'},
+        {key: 'Membership', title: 'Membership'},
+        {key: 'Notification', title: 'Notification'},
       ],
 
-      current_Password: "",
-      new_Password: "",
-      repeat_Password: "",
-      current_Email: "",
-      new_Email: "",
-      repeat_Email: "",
+      current_Password: '',
+      new_Password: '',
+      repeat_Password: '',
+      current_Email: '',
+      new_Email: '',
+      repeat_Email: '',
       loading: false,
-      isDeleteDialogVisible: false
+      isDeleteDialogVisible: false,
     };
   }
 
   componentDidMount() {
-    BackHandler.addEventListener("hardwareBackPress", () => {
+    BackHandler.addEventListener('hardwareBackPress', () => {
       this.props.navigation.goBack();
       return true;
     });
   }
   changePassword = () => {
-    this.setState({ loading: true });
-    const { current_Password, new_Password, repeat_Password } = this.state;
+    this.setState({loading: true});
+    const {current_Password, new_Password, repeat_Password} = this.state;
     Api.changePassword(current_Password, new_Password, repeat_Password)
       .then(res => {
-        this.setState({ loading: false });
-        ToastAndroid.show("Password Changed Successfully", ToastAndroid.LONG);
+        this.setState({loading: false});
+        Toast.show('Password Changed Successfully', {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        });
       })
-      .catch(error => ToastAndroid.show(error, ToastAndroid.LONG));
+      .catch(error =>
+        Toast.show(error, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        }),
+      );
   };
   changeEmail = () => {
-    this.setState({ loading: true });
-    const { current_Email, new_Email, repeat_Email } = this.state;
+    this.setState({loading: true});
+    const {current_Email, new_Email, repeat_Email} = this.state;
 
     Api.changeEmail(current_Email, new_Email, repeat_Email)
       .then(res => {
-        this.setState({ loading: false });
-        ToastAndroid.show("Email Changed Successfully", ToastAndroid.LONG);
+        this.setState({loading: false});
+        Toast.show('Email Changed Successfully', {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        });
       })
-      .catch(error => ToastAndroid.show(error, ToastAndroid.LONG));
+      .catch(error =>
+        Toast.show(error, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        }),
+      );
   };
   deleteAccount = () => {
     Api.deleteAccount()
       .then(res => {
         console.log(this.props);
-        AsyncStorage.removeItem("token");
+        AsyncStorage.removeItem('token');
         delete global.user;
-        this.props.navigation.navigate("LoginScreen");
+        this.props.navigation.navigate('LoginScreen');
       })
-      .catch(error => ToastAndroid.show(error, ToastAndroid.LONG));
+      .catch(error =>
+        Toast.show(error, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        }),
+      );
   };
   render() {
-    const { premium, premium_until } = global.user.meta;
+    const {premium, premium_until} = global.user.meta;
     if (this.state.loading == true) return <ActivityOverlay />;
 
     return (
       <React.Fragment>
-        <CommonHeaderBack title={"Settings"} />
+        <CommonHeaderBack title={'Settings'} />
         <TabView
           sceneContainerStyle={{
             flex: 1,
-            backgroundColor: Colors.textColor
+            backgroundColor: Colors.textColor,
           }}
           navigationState={this.state}
-          renderScene={({ route, jumpTo }) => {
+          renderScene={({route, jumpTo}) => {
             switch (route.key) {
-              case "Account":
+              case 'Account':
                 return (
                   <ScrollView>
                     <Card containerStyle={Styles.cardStyle}>
@@ -115,7 +136,7 @@ export default class SettingsScreen extends Component {
                           style={[Styles.textInput]}
                           value={this.state.current_Password}
                           onChangeText={text =>
-                            this.setState({ current_Password: text })
+                            this.setState({current_Password: text})
                           }
                         />
 
@@ -124,7 +145,7 @@ export default class SettingsScreen extends Component {
                           style={[Styles.textInput]}
                           value={this.state.new_Password}
                           onChangeText={text =>
-                            this.setState({ new_Password: text })
+                            this.setState({new_Password: text})
                           }
                         />
 
@@ -133,22 +154,18 @@ export default class SettingsScreen extends Component {
                           style={[Styles.textInput]}
                           value={this.state.repeat_Password}
                           onChangeText={text =>
-                            this.setState({ repeat_Password: text })
+                            this.setState({repeat_Password: text})
                           }
                         />
                         <TouchableOpacity
                           style={Styles.TouchableOpacity}
-                          onPress={this.changePassword}
-                        >
+                          onPress={this.changePassword}>
                           <LinearGradient
-                            colors={["#FC3838", "#F52B43", "#ED0D51"]}
-                            start={{ x: 0.7, y: 1.2 }}
-                            end={{ x: 0.0, y: 0.7 }}
-                            style={Styles.linear}
-                          >
-                            <Text
-                              style={{ color: "white", fontWeight: "bold" }}
-                            >
+                            colors={['#FC3838', '#F52B43', '#ED0D51']}
+                            start={{x: 0.7, y: 1.2}}
+                            end={{x: 0.0, y: 0.7}}
+                            style={Styles.linear}>
+                            <Text style={{color: 'white', fontWeight: 'bold'}}>
                               Change Password
                             </Text>
                           </LinearGradient>
@@ -162,10 +179,10 @@ export default class SettingsScreen extends Component {
                           placeholder="Current Email Address"
                           placeholderTextColor={Colors.secondaryColor}
                           underlineColorAndroid={Colors.mainAppColor}
-                          autoCapitalize={"none"}
+                          autoCapitalize={'none'}
                           autoCorrect={false}
                           onChangeText={text =>
-                            this.setState({ current_Email: text })
+                            this.setState({current_Email: text})
                           }
                           value={this.state.current_Email}
                         />
@@ -174,10 +191,10 @@ export default class SettingsScreen extends Component {
                           placeholder="New Email Address"
                           placeholderTextColor={Colors.secondaryColor}
                           underlineColorAndroid={Colors.mainAppColor}
-                          autoCapitalize={"none"}
+                          autoCapitalize={'none'}
                           autoCorrect={false}
                           onChangeText={text =>
-                            this.setState({ new_Email: text })
+                            this.setState({new_Email: text})
                           }
                           value={this.state.new_Email}
                         />
@@ -186,57 +203,48 @@ export default class SettingsScreen extends Component {
                           placeholder="Repeat Email Address"
                           placeholderTextColor={Colors.secondaryColor}
                           underlineColorAndroid={Colors.mainAppColor}
-                          autoCapitalize={"none"}
+                          autoCapitalize={'none'}
                           autoCorrect={false}
                           onChangeText={text =>
-                            this.setState({ repeat_Email: text })
+                            this.setState({repeat_Email: text})
                           }
                           value={this.state.repeat_Email}
                         />
                         <TouchableOpacity
                           style={Styles.TouchableOpacity}
-                          onPress={this.changeEmail}
-                        >
+                          onPress={this.changeEmail}>
                           <LinearGradient
-                            colors={["#FC3838", "#F52B43", "#ED0D51"]}
-                            start={{ x: 0.7, y: 1.2 }}
-                            end={{ x: 0.0, y: 0.7 }}
-                            style={Styles.linear}
-                          >
-                            <Text
-                              style={{ color: "white", fontWeight: "bold" }}
-                            >
+                            colors={['#FC3838', '#F52B43', '#ED0D51']}
+                            start={{x: 0.7, y: 1.2}}
+                            end={{x: 0.0, y: 0.7}}
+                            style={Styles.linear}>
+                            <Text style={{color: 'white', fontWeight: 'bold'}}>
                               Change Email Address
                             </Text>
                           </LinearGradient>
                         </TouchableOpacity>
                       </View>
                     </Card>
-                    <Card
-                      containerStyle={{ marginBottom: 50, borderRadius: 8 }}
-                    >
+                    <Card containerStyle={{marginBottom: 50, borderRadius: 8}}>
                       <Text
                         style={{
                           color: Colors.mainAppColor,
-                          justifyContent: "center",
-                          textAlign: "center"
-                        }}
-                      >
+                          justifyContent: 'center',
+                          textAlign: 'center',
+                        }}>
                         Once you delete your account you will be logged out
                       </Text>
                       <TouchableOpacity
                         style={Styles.TouchableOpacity}
                         onPress={() => {
-                          this.setState({ isDeleteDialogVisible: true });
-                        }}
-                      >
+                          this.setState({isDeleteDialogVisible: true});
+                        }}>
                         <LinearGradient
-                          colors={["#FC3838", "#F52B43", "#ED0D51"]}
-                          start={{ x: 0.7, y: 1.2 }}
-                          end={{ x: 0.0, y: 0.7 }}
-                          style={Styles.linear}
-                        >
-                          <Text style={{ color: "white", fontWeight: "bold" }}>
+                          colors={['#FC3838', '#F52B43', '#ED0D51']}
+                          start={{x: 0.7, y: 1.2}}
+                          end={{x: 0.0, y: 0.7}}
+                          style={Styles.linear}>
+                          <Text style={{color: 'white', fontWeight: 'bold'}}>
                             Delete Account
                           </Text>
                         </LinearGradient>
@@ -256,28 +264,26 @@ export default class SettingsScreen extends Component {
                               textStyle={Styles.DialogTitle}
                               text="CANCEL"
                               onPress={() =>
-                                this.setState({ isDeleteDialogVisible: false })
+                                this.setState({isDeleteDialogVisible: false})
                               }
                             />
                             <DialogButton
                               textStyle={Styles.DialogTitle}
                               text="DELETE"
                               onPress={() => {
-                                this.setState({ isDeleteDialogVisible: false });
+                                this.setState({isDeleteDialogVisible: false});
                                 this.deleteAccount();
                               }}
                             />
                           </DialogFooter>
-                        }
-                      >
+                        }>
                         <DialogContent>
                           <View
                             style={{
                               flex: 1,
                               margin: 10,
-                              alignItems: "center"
-                            }}
-                          >
+                              alignItems: 'center',
+                            }}>
                             <Text style={Styles.textTitle}>Are you Sure?</Text>
                           </View>
                         </DialogContent>
@@ -285,7 +291,7 @@ export default class SettingsScreen extends Component {
                     </Card>
                   </ScrollView>
                 );
-              case "Membership":
+              case 'Membership':
                 return (
                   <ScrollView>
                     {premium != 1 && (
@@ -299,9 +305,8 @@ export default class SettingsScreen extends Component {
                       <Card containerStyle={Styles.cardStyle}>
                         <Text style={Styles.warningText}>Premium Until </Text>
                         <Text
-                          style={[Styles.warningText, { color: Colors.banner }]}
-                        >
-                          {moment(premium_until).format("MMM Do YYYY")}{" "}
+                          style={[Styles.warningText, {color: Colors.banner}]}>
+                          {moment(premium_until).format('MMM Do YYYY')}{' '}
                         </Text>
                       </Card>
                     )}
@@ -311,8 +316,8 @@ export default class SettingsScreen extends Component {
               //   return <View />;
             }
           }}
-          onIndexChange={index => this.setState({ index })}
-          initialLayout={{ width: Dimensions.get("window").width }}
+          onIndexChange={index => this.setState({index})}
+          initialLayout={{width: Dimensions.get('window').width}}
         />
       </React.Fragment>
     );

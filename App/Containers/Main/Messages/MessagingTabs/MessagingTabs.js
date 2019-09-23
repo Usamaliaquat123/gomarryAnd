@@ -1,6 +1,6 @@
 import React from "react";
 
-import { createBottomTabNavigator, TabBarBottom } from "react-navigation";
+import { createBottomTabNavigator, TabBarBottom } from "react-navigation-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 import { Icon ,Badge} from "react-native-elements";
@@ -45,7 +45,7 @@ export default createBottomTabNavigator(
               size={20}
               style={{ position: 'absolute' }}
               name="folder-open-o"
-              color={Colors.mainAppColor}
+              color={Colors.textColor}
             />
 
             </View>
@@ -86,10 +86,10 @@ export default createBottomTabNavigator(
                 // })
               }
             <Icon
-              type="evilicon"
+              type="antdesign"
               size={20}
-              name="star"
-              color={Colors.mainAppColor}
+              name="staro"
+              color={Colors.textColor}
             />
             </View>
             
@@ -108,7 +108,7 @@ export default createBottomTabNavigator(
               size={20}
               style={{ position: 'absolute' }}
               name="archive"
-              color={Colors.mainAppColor}
+              color={Colors.textColor}
             />
             </View>
           );
@@ -136,7 +136,10 @@ export default createBottomTabNavigator(
     tabBarOptions: {
       showLabel: false,
       activeTintColor: Colors.mainAppColor,
-      inactiveTintColor: "gray"
+      inactiveTintColor: "gray",
+      style: {
+        backgroundColor: Colors.mainAppColor
+      }
     },
     tabBarComponent: TabBarBottom,
     tabBarPosition: "bottom",

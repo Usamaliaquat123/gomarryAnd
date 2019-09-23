@@ -1,5 +1,5 @@
 import React from "react";
-import { createDrawerNavigator } from "react-navigation";
+import { createDrawerNavigator } from "react-navigation-drawer";
 import { Icon } from "react-native-elements";
 import DrawerContent from "../Containers/DrawerContent";
 import SurveyScreen from "../Containers/Main/Survey/SurveyScreen";

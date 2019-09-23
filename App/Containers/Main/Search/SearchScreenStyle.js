@@ -24,10 +24,11 @@ export default StyleSheet.create({
     textAlign: "center"
   },
   rowpicker: {
-    flex: 1,
+    marginBottom:10,
+    flex:1,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-around"
   },
   rowcheckboxes: {
     flex: 1,

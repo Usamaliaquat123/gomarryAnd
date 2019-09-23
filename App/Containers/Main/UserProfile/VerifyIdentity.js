@@ -1,9 +1,13 @@
 import React, { Component } from "react";
 import { BackHandler, TouchableOpacity, View } from "react-native";
 import { Icon, Text, Image, Card } from "react-native-elements";
-import { Upload } from "react-native-tus-client";
+// import { Upload } from "react-native-tus-client";
+import tus from "tus-js-client"
+
 import LinearGradient from "react-native-linear-gradient";
-import ImagePicker from "react-native-image-crop-picker";
+// import ImagePicker from "react-native-image-crop-picker";
+import ImagePicker from 'react-native-image-picker';
+
 import Api from "../../../Services/Api";
 
 import { Images, Colors, Fonts } from "../../../Themes";
@@ -21,6 +25,8 @@ export default class VerifyIdentity extends Component {
       uploadedBytes: 0,
       totalBytes: 0,
       file: null,
+      filename:null,
+      filetype:null,
       status: "no file selected"
     };
 
@@ -34,14 +40,17 @@ export default class VerifyIdentity extends Component {
     });
   }
   selectPhotoTapped() {
-    ImagePicker.openPicker({}).then(result => {
+    ImagePicker.showImagePicker({} ,result => {
+      console.log("result",result)
       if (!result.cancelled) {
-        if (result.mime === "image/jpeg")
+        if (result.type === "image/jpeg")
           this.setState({
-            file: result.path,
+            file: result,
+            filename:result.fileName,
+            filetype:result.type,
             status: "file selected"
           });
-        else ToastAndroid.show(`Please Select Image`, ToastAndroid.LONG);
+        else console.log(result)
       }
     });
   }
@@ -59,22 +68,20 @@ export default class VerifyIdentity extends Component {
     return `image/${extension}`;
   }
   startUpload() {
+    const {file,filename,filetype} =this.state
     console.log("welcome in upload");
-    const file = this.state.file;
-
     if (!file) return;
-    let path = file.substr(8);
-    console.log(token);
-    const extension = this.getFileExtension(file);
-    const upload = new Upload(path, {
+    console.log(token,file);
+    const upload = new tus.Upload(file, {
       headers: { "X-Auth-Token": token },
       endpoint: `${Api._base}/api/submitVerificationPicture`, // use goMarry tus server endpoint instead
       retryDelays: [0, 1000, 3000, 5000],
       metadata: {
-        filename: `photo.${extension}`,
-        filetype: this.getMimeType(extension)
+        filename,
+        filetype
       },
       onError: error => {
+
         this.setState({
           status: `upload failed ${error}`
         });
@@ -125,7 +132,7 @@ export default class VerifyIdentity extends Component {
           <Image
             style={Styles.idImage}
             resizeMode="cover"
-            source={file ? { uri: file } : Images.verifyID}
+            source={file ? { uri: file.uri } : Images.verifyID}
           />
 
           <Text style={Styles.textStyles2}>

@@ -1,15 +1,16 @@
-import React, { Component } from "react";
-import { Text, ScrollView, ToastAndroid } from "react-native";
-import { ButtonGroup } from "react-native-elements";
-import Dataset from "impagination";
-import Api from "../../../Services/Api";
+import React, {Component} from 'react';
+import {Text, ScrollView} from 'react-native';
+import {ButtonGroup} from 'react-native-elements';
+import Dataset from 'impagination';
+import Api from '../../../Services/Api';
+import Toast from 'react-native-root-toast';
 
-import CommonHeader from "../../../Components/CommonHeader";
-import UserCard from "../../../Components/UserCard";
+import CommonHeader from '../../../Components/CommonHeader';
+import UserCard from '../../../Components/UserCard';
 
 // Styles
-import SampleUserCard from "../../../Components/SampleUserCard";
-import { Fonts, Colors } from "../../../Themes";
+import SampleUserCard from '../../../Components/SampleUserCard';
+import {Fonts, Colors} from '../../../Themes';
 
 const component1 = () => <Text>Approved</Text>;
 const component2 = () => <Text>Pending</Text>;
@@ -22,14 +23,14 @@ export default class RequestsScreen extends Component {
       datasetState: null,
       loading: true,
       selectedIndex: 0,
-      Flag: false
+      Flag: false,
     };
     this.updateIndex = this.updateIndex.bind(this);
   }
   componentWillMount() {
     const section = this.props.navigation.state.params.section
-      ? "pending"
-      : "approved";
+      ? 'pending'
+      : 'approved';
 
     this.setupImpagination(section);
   }
@@ -44,7 +45,7 @@ export default class RequestsScreen extends Component {
       // Anytime there's a new state emitted, we want to set that on
       // the componets local state.
       observe(datasetState) {
-        _this.setState({ datasetState });
+        _this.setState({datasetState});
       },
 
       // Where to fetch the data from.
@@ -53,18 +54,21 @@ export default class RequestsScreen extends Component {
           .then(data => {
             if (data.requests.length != 0) return data.requests;
             else {
-              _this.setState({ Flag: true });
+              _this.setState({Flag: true});
               return;
             }
           })
           .catch(error => {
-            ToastAndroid.show(error, ToastAndroid.LONG);
+            Toast.show(error, {
+              duration: Toast.durations.LONG,
+              position: Toast.positions.BOTTOM,
+            });
           });
-      }
+      },
     });
 
     dataset.setReadOffset(0);
-    this.setState({ dataset });
+    this.setState({dataset});
   }
 
   setCurrentReadOffset = event => {
@@ -94,16 +98,16 @@ export default class RequestsScreen extends Component {
   }
 
   updateIndex(selectedIndex) {
-    this.setState({ selectedIndex });
+    this.setState({selectedIndex});
     this.fetchSection(selectedIndex);
   }
   fetchSection(index) {
-    this.setState({ loading: true, Flag: false });
+    this.setState({loading: true, Flag: false});
     if (index === 0) {
-      this.setupImpagination("approved");
+      this.setupImpagination('approved');
     }
     if (index === 1) {
-      this.setupImpagination("pending");
+      this.setupImpagination('pending');
     }
   }
   requestResponed = (request_id, decision, section) => {
@@ -112,26 +116,26 @@ export default class RequestsScreen extends Component {
     });
   };
   render() {
-    const buttons = [{ element: component1 }, { element: component2 }];
-    const { selectedIndex } = this.state;
+    const buttons = [{element: component1}, {element: component2}];
+    const {selectedIndex} = this.state;
     return (
       <ScrollView>
-        <CommonHeader title={"Requests"} />
+        <CommonHeader title={'Requests'} />
 
         <ButtonGroup
           onPress={this.updateIndex}
           selectedIndex={selectedIndex}
           buttons={buttons}
           containerBorderRadius={0}
-          selectedButtonStyle={{ backgroundColor: "#FFF" }}
+          selectedButtonStyle={{backgroundColor: '#FFF'}}
           containerStyle={{
-            width: "100%",
+            width: '100%',
             height: 50,
             marginLeft: 0,
             marginTop: 0,
             borderWidth: 1,
             borderRadius: null,
-            borderColor: Colors.mainAppColor
+            borderColor: Colors.mainAppColor,
           }}
         />
 
@@ -140,13 +144,12 @@ export default class RequestsScreen extends Component {
           <Text
             style={{
               marginTop: 50,
-              textAlign: "center",
+              textAlign: 'center',
               fontSize: 16,
               fontFamily: Fonts.app_font,
 
-              fontWeight: "400"
-            }}
-          >
+              fontWeight: '400',
+            }}>
             No Request
           </Text>
         )}

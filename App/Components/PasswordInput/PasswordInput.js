@@ -37,7 +37,6 @@ export default class PasswordInputText extends Component {
         <TextInput
           {...this.props}
           placeholderTextColor={Colors.secondaryColor}
-          underlineColorAndroid={Colors.mainAppColor}
           secureTextEntry={this.state.password}
           maxLength={25}
           autoCapitalize={"none"}
@@ -60,11 +59,11 @@ export default class PasswordInputText extends Component {
 export const styles = StyleSheet.create({
   icon: {
     position: "absolute",
-    top: 3,
-    right: 0
+    top: 7,
+    right: 3
   }
 });
 
 PasswordInputText.defaultProps = {
-  iconSize: 25
+  iconSize: 25,
 };

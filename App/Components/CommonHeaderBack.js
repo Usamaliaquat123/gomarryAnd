@@ -1,33 +1,36 @@
-import React from "react";
-import { Platform, ToastAndroid } from "react-native";
-import AsyncStorage from "@react-native-community/async-storage";
-import { Icon, Text, Header } from "react-native-elements";
-import { withNavigation } from "react-navigation";
-import { NavigationActions } from "react-navigation";
+import React from 'react';
+import AsyncStorage from '@react-native-community/async-storage';
+import {Icon, Text, Header} from 'react-native-elements';
+import {withNavigation} from 'react-navigation';
+import {NavigationActions} from 'react-navigation';
+import Toast from 'react-native-root-toast';
 
-import { Colors, Fonts } from "../Themes";
-import Api from "../Services/Api";
+import {Colors, Fonts} from '../Themes';
+import Api from '../Services/Api';
 
 const CommonHeaderBack = props => {
   const logout = () => {
     Api.logout()
       .then(res => {
-        AsyncStorage.removeItem("token");
+        AsyncStorage.removeItem('token');
         delete global.user;
         props.navigation.reset(
-          [NavigationActions.navigate({ routeName: "LoginScreen" })],
-          0
+          [NavigationActions.navigate({routeName: 'LoginScreen'})],
+          0,
         );
       })
       .catch(error => {
-        ToastAndroid.show(error, ToastAndroid.LONG);
+        Toast.show(error, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        });
       });
   };
   return (
     <Header
       containerStyle={{
         backgroundColor: Colors.mainAppColor,
-        marginTop: Platform.OS === "ios" ? 0 : -30
+        marginTop: Platform.OS === 'ios' ? 0 : -30,
       }}
       leftComponent={
         props.logout ? null : (
@@ -45,11 +48,10 @@ const CommonHeaderBack = props => {
         <Text
           style={{
             fontSize: 24,
-            fontWeight: "600",
+            fontWeight: '600',
             fontFamily: Fonts.LatoBold,
-            color: Colors.textColor
-          }}
-        >
+            color: Colors.textColor,
+          }}>
           {props.title}
         </Text>
       }
@@ -57,7 +59,7 @@ const CommonHeaderBack = props => {
         props.logout ? (
           <Icon
             type="simple-line-icon"
-            name={"logout"}
+            name={'logout'}
             size={30}
             color={Colors.textColor}
             underlayColor={Colors.mainAppColor}

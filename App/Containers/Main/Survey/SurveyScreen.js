@@ -1,27 +1,21 @@
-import React, { Component } from "react";
-import {
-  ToastAndroid,
-  Alert,
-  Text,
-  View,
-  TextInput,
-  ScrollView,
-  FlatList
-} from "react-native";
-import { CheckBox, ButtonGroup, Card } from "react-native-elements";
-import Api from "../../../Services/Api";
-import RadioForm from "react-native-simple-radio-button";
-import ActivityOverlay from "../../../Components/ActivityOverlay";
-import CommonHeaderBack from "../../../Components/CommonHeaderBack";
+import React, {Component} from 'react';
+import {Alert, Text, View, TextInput, ScrollView, FlatList} from 'react-native';
+import Toast from 'react-native-root-toast';
+
+import {CheckBox, ButtonGroup, Card} from 'react-native-elements';
+import Api from '../../../Services/Api';
+import RadioForm from 'react-native-simple-radio-button';
+import ActivityOverlay from '../../../Components/ActivityOverlay';
+import CommonHeaderBack from '../../../Components/CommonHeaderBack';
 // Styles
-import styles from "./SurveyScreenStyle";
-import { Colors } from "../../../Themes";
+import styles from './SurveyScreenStyle';
+import {Colors} from '../../../Themes';
 
 const rateAnswerslist = [
-  { label: "Not important", value: 1 },
-  { label: "Important", value: 3 },
-  { label: "Very important", value: 5 },
-  { label: " It's a deal breaker!", value: 7 }
+  {label: 'Not important', value: 1},
+  {label: 'Important', value: 3},
+  {label: 'Very important', value: 5},
+  {label: " It's a deal breaker!", value: 7},
 ];
 
 const component1 = () => <Text style={styles.buttonText}>Back</Text>;
@@ -35,30 +29,30 @@ export default class SurveyScreen extends Component {
       selectedIndex: 0,
 
       gender: global.user.meta.gender == 1 ? 0 : 1,
-      rateAnswer: "",
-      questionText: "",
-      currentQuestionId: "",
-      nextQuestion: "",
-      perviousQuestion: "",
+      rateAnswer: '',
+      questionText: '',
+      currentQuestionId: '',
+      nextQuestion: '',
+      perviousQuestion: '',
       loading: true,
       answer: null,
       answers: [],
       selectedMultiplyAnswer: [],
-      commentText: "",
+      commentText: '',
       commentLabel: null,
       isComment: false,
       isChecked: [],
-      type: null
+      type: null,
     };
     this.updateIndex = this.updateIndex.bind(this);
   }
 
   updateIndex(selectedIndex) {
-    this.setState({ selectedIndex });
+    this.setState({selectedIndex});
     this.fetchSection(selectedIndex);
   }
   fetchSection(index) {
-    this.setState({ loading: true });
+    this.setState({loading: true});
     if (index === 0) {
       this.perviousQuestion();
     }
@@ -76,50 +70,54 @@ export default class SurveyScreen extends Component {
   };
 
   perviousQuestion = () => {
-    this.setState({ loading: true });
+    this.setState({loading: true});
 
-    const { perviousQuestion } = this.state;
+    const {perviousQuestion} = this.state;
 
     if (perviousQuestion) {
       this.currentQuestion(perviousQuestion);
     } else {
-      this.setState({ loading: false });
-
-      ToastAndroid.show("Can't go back", ToastAndroid.LONG);
+      this.setState({loading: false});
+      Toast.show("Can't go back to previous question", {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.BOTTOM,
+      });
     }
   };
   SaveAnswer = () => {
-    this.setState({ loading: true });
-    const { answer, currentQuestionId, rateAnswer, commentText } = this.state;
+    this.setState({loading: true});
+    const {answer, currentQuestionId, rateAnswer, commentText} = this.state;
     Api.setSurveyAnswer(currentQuestionId, answer, rateAnswer, commentText)
       .then(data => {
         this.skipQuestion();
       })
       .catch(error => {
-        Alert.alert("Error", error);
-        this.setState({ loading: false });
+        Alert.alert('Error', error);
+        this.setState({loading: false});
       });
   };
   skipQuestion = () => {
-    this.setState({ loading: true, isChecked: [], selectedMultiplyAnswer: [] });
+    this.setState({loading: true, isChecked: [], selectedMultiplyAnswer: []});
 
-    const { nextQuestion } = this.state;
+    const {nextQuestion} = this.state;
 
     if (nextQuestion) {
       this.currentQuestion(nextQuestion);
     } else {
-      this.setState({ loading: false });
-
-      ToastAndroid.show("Can't go forward", ToastAndroid.LONG);
+      this.setState({loading: false});
+      Toast.show("Can't go forward", {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.BOTTOM,
+      });
     }
   };
   currentQuestion = id => {
-    const { gender } = this.state;
+    const {gender} = this.state;
 
     Api.getSurveyQuestion(id)
       .then(data => {
         console.log(data);
-        this.setState({ loading: false });
+        this.setState({loading: false});
         this.setState({
           questionText: data.question.question,
           nextQuestion: data.next_id,
@@ -127,25 +125,25 @@ export default class SurveyScreen extends Component {
           perviousQuestion: data.previous_id,
           answers: data.question.answers[gender],
           commentLabel: data.question.comments,
-          type: data.question.type
+          type: data.question.type,
         });
       })
       .catch(error => {
-        this.setState({ loading: false });
-        Alert.alert("Error", error);
+        this.setState({loading: false});
+        Alert.alert('Error', error);
       });
   };
   componentDidMount() {
     this.currentQuestion(this.state.currentQuestionId);
   }
   onSelectionsChangeAnswer = selectedMultiplyAnswer => {
-    this.setState({ selectedMultiplyAnswer });
+    this.setState({selectedMultiplyAnswer});
   };
 
   isIconCheckedOrNot = (item, index) => {
-    let { isChecked, selectedMultiplyAnswer } = this.state;
+    let {isChecked, selectedMultiplyAnswer} = this.state;
     isChecked[index] = !isChecked[index];
-    this.setState({ isChecked: isChecked });
+    this.setState({isChecked: isChecked});
     if (isChecked[index] == true) {
       selectedMultiplyAnswer.push(item.value);
     } else {
@@ -153,7 +151,7 @@ export default class SurveyScreen extends Component {
     }
 
     this.setState({
-      answer: selectedMultiplyAnswer.reduce((a, b) => a + b, 0)
+      answer: selectedMultiplyAnswer.reduce((a, b) => a + b, 0),
     });
   };
 
@@ -165,29 +163,28 @@ export default class SurveyScreen extends Component {
       commentLabel,
       commentText,
       selectedIndex,
-      type
+      type,
     } = this.state;
     const buttons = [
-      { element: component1 },
-      { element: component2 },
-      { element: component3 }
+      {element: component1},
+      {element: component2},
+      {element: component3},
     ];
     let answerslist = [];
     for (index in answers) {
-      answerslist.push({ label: answers[index], value: Math.pow(2, index) });
+      answerslist.push({label: answers[index], value: Math.pow(2, index)});
     }
     if (loading == true) return <ActivityOverlay />;
 
     return (
       <React.Fragment>
-        <CommonHeaderBack title={"Survey"} />
-        <ScrollView style={{ backgroundColor: Colors.textColor }}>
+        <CommonHeaderBack title={'Survey'} />
+        <ScrollView style={{backgroundColor: Colors.textColor}}>
           <Card
             containerStyle={{
               borderRadius: 8,
-              flexDirection: "column"
-            }}
-          >
+              flexDirection: 'column',
+            }}>
             <Text style={styles.textStyle}>Q: {questionText}</Text>
 
             {!type && (
@@ -195,12 +192,12 @@ export default class SurveyScreen extends Component {
                 radio_props={answerslist}
                 initial={-1}
                 onPress={value => {
-                  this.setState({ answer: value });
+                  this.setState({answer: value});
                 }}
               />
             )}
             {type && (
-              <View style={{ flex: 1, flexDirection: "column" }}>
+              <View style={{flex: 1, flexDirection: 'column'}}>
                 <Text>(Choose all that apply)</Text>
                 <FlatList
                   data={answerslist}
@@ -209,9 +206,9 @@ export default class SurveyScreen extends Component {
                       key={item.index}
                       containerStyle={{
                         borderWidth: 0,
-                        backgroundColor: Colors.textColor
+                        backgroundColor: Colors.textColor,
                       }}
-                      textStyle={{ fontWeight: "400", color: "#000000" }}
+                      textStyle={{fontWeight: '400', color: '#000000'}}
                       title={item.item.label}
                       checkedIcon="dot-circle-o"
                       uncheckedIcon="circle-o"
@@ -226,15 +223,15 @@ export default class SurveyScreen extends Component {
               </View>
             )}
             {commentLabel && (
-              <View style={{ margin: 1 }}>
+              <View style={{margin: 1}}>
                 <Text style={styles.textStyle}>{commentLabel}</Text>
                 <TextInput
                   style={{
-                    borderColor: "gray",
+                    borderColor: 'gray',
                     borderWidth: 1,
-                    borderRadius: 8
+                    borderRadius: 8,
                   }}
-                  onChangeText={commentText => this.setState({ commentText })}
+                  onChangeText={commentText => this.setState({commentText})}
                   value={commentText}
                   editable={true}
                   multiline={true}
@@ -245,19 +242,18 @@ export default class SurveyScreen extends Component {
 
           <Card
             containerStyle={{
-              backgroundColor: "#F9F1C6",
+              backgroundColor: '#F9F1C6',
               borderRadius: 8,
-              flexDirection: "column"
-            }}
-          >
-            <Text style={[styles.textStyle, { color: "#8A6D3B" }]}>
+              flexDirection: 'column',
+            }}>
+            <Text style={[styles.textStyle, {color: '#8A6D3B'}]}>
               Rate IMPORTANCE Below:
             </Text>
 
             <RadioForm
               radio_props={rateAnswerslist}
               onPress={value => {
-                this.setState({ rateAnswer: value });
+                this.setState({rateAnswer: value});
               }}
             />
           </Card>
@@ -267,16 +263,16 @@ export default class SurveyScreen extends Component {
           onPress={this.updateIndex}
           selectedIndex={selectedIndex}
           buttons={buttons}
-          selectedButtonStyle={{ backgroundColor: Colors.mainAppColor }}
+          selectedButtonStyle={{backgroundColor: Colors.mainAppColor}}
           containerStyle={{
             backgroundColor: Colors.mainAppColor,
-            width: "100%",
+            width: '100%',
             height: 50,
             marginLeft: 0,
             marginBottom: 0,
             marginTop: 0,
             borderWidth: 0,
-            borderRadius: 0
+            borderRadius: 0,
           }}
         />
       </React.Fragment>

@@ -44,9 +44,11 @@ export default StyleSheet.create({
   },
   textInput: {
     fontFamily: Fonts.LatoRegular,
-
+    borderWidth:1,
+    borderRadius:3,
+    borderColor:Colors.secondaryColor,
     alignSelf: "stretch",
-    height: 40,
+    height: 45,
     marginBottom: 25,
     color: "#757575"
   },

@@ -1,12 +1,17 @@
 const Fonts = {
-  app_font: "Lato-Bold",
-  LatoBold: "Lato-Bold",
-  LatoRegular: "Lato-Regular",
-  LatoThin: "Lato-Thin",
-  LatoLight: "Lato-Light",
+  app_font: null,
+  LatoBold: null,
+  LatoRegular: null,
+  LatoThin: null,
+  LatoLight: null,
 
-  bold: "Lato-Thin",
-  font2: "Montserrat"
+
+  // app_font: "Lato-Bold",
+  // LatoBold: "Lato-Bold",
+  // LatoRegular: "Lato-Regular",
+  // LatoThin: "Lato-Thin",
+  // LatoLight: "Lato-Light",
+
 };
 
 export default Fonts;

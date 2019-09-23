@@ -1,37 +1,37 @@
-import React, { Component } from "react";
+import React, {Component} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   FlatList,
-  ToastAndroid,
-  ActivityIndicator
-} from "react-native";
-import Api from "../Services/Api";
-import CommonHeaderBack from "./CommonHeaderBack";
-import ActivityOverlay from "./ActivityOverlay";
+  ActivityIndicator,
+} from 'react-native';
+import Toast from 'react-native-root-toast';
+import Api from '../Services/Api';
+import CommonHeaderBack from './CommonHeaderBack';
+import ActivityOverlay from './ActivityOverlay';
 
-import UserCard from "./UserCard";
-import { Fonts } from "../Themes";
+import UserCard from './UserCard';
+import {Fonts} from '../Themes';
 
 class ViewAll extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      title: this.props.navigation.getParam("title", "View All"),
-      section: this.props.navigation.getParam("section", ""),
-      filter: this.props.navigation.getParam("filter", ""),
+      title: this.props.navigation.getParam('title', 'View All'),
+      section: this.props.navigation.getParam('section', ''),
+      filter: this.props.navigation.getParam('filter', ''),
       loading: true,
       serverData: [],
       fetching_from_server: false,
-      itemslimit: false
+      itemslimit: false,
     };
     this.offset = 1;
   }
   FetchData() {
-    const { filter } = this.state;
-    if (filter == "") {
+    const {filter} = this.state;
+    if (filter == '') {
       Api.interests(this.state.section, this.offset, 1)
         .then(data => {
           console.log(this.offset);
@@ -39,7 +39,7 @@ class ViewAll extends Component {
           if (data.users.length === 0) {
             this.setState({
               loading: false,
-              itemslimit: true
+              itemslimit: true,
             });
             return;
           }
@@ -49,15 +49,18 @@ class ViewAll extends Component {
 
             this.setState({
               loading: false,
-              fetching_from_server: false
+              fetching_from_server: false,
             });
-          } else this.setState({ itemslimit: true });
+          } else this.setState({itemslimit: true});
         })
         .catch(error => {
           this.setState({
-            loading: false
+            loading: false,
           });
-          ToastAndroid.show(error, ToastAndroid.LONG);
+          Toast.show(error, {
+            duration: Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+          });
         });
     } else {
       Api.search({}, this.offset, 20)
@@ -68,15 +71,18 @@ class ViewAll extends Component {
             this.state.serverData.push(...data.users);
             this.setState({
               loading: false,
-              fetching_from_server: false
+              fetching_from_server: false,
             });
-          } else this.setState({ itemslimit: true });
+          } else this.setState({itemslimit: true});
         })
         .catch(error => {
           this.setState({
-            loading: false
+            loading: false,
           });
-          ToastAndroid.show(error, ToastAndroid.LONG);
+          Toast.show(error, {
+            duration: Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+          });
         });
     }
   }
@@ -84,7 +90,7 @@ class ViewAll extends Component {
     this.FetchData();
   }
   loadMoreData = () => {
-    this.setState({ fetching_from_server: true }, () => this.FetchData());
+    this.setState({fetching_from_server: true}, () => this.FetchData());
   };
   renderFooter() {
     return (
@@ -92,27 +98,26 @@ class ViewAll extends Component {
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={this.loadMoreData}
-          style={styles.loadMoreBtn}
-        >
+          style={styles.loadMoreBtn}>
           <Text style={styles.btnText}>Load More</Text>
           {this.state.fetching_from_server ? (
-            <ActivityIndicator color="white" style={{ marginLeft: 8 }} />
+            <ActivityIndicator color="white" style={{marginLeft: 8}} />
           ) : null}
         </TouchableOpacity>
       </View>
     );
   }
   render() {
-    const { title } = this.state;
+    const {title} = this.state;
     if (this.state.loading) return <ActivityOverlay />;
     return (
       <React.Fragment>
         <CommonHeaderBack title={title} />
         <FlatList
-          style={{ width: "100%" }}
+          style={{width: '100%'}}
           keyExtractor={(item, index) => index}
           data={this.state.serverData}
-          renderItem={({ item, index }) => <UserCard key={index} user={item} />}
+          renderItem={({item, index}) => <UserCard key={index} user={item} />}
           ListFooterComponent={
             !this.state.itemslimit ? this.renderFooter.bind(this) : null
           }
@@ -124,25 +129,25 @@ class ViewAll extends Component {
 const styles = StyleSheet.create({
   footer: {
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row"
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   loadMoreBtn: {
     padding: 10,
-    backgroundColor: "#800000",
+    backgroundColor: '#800000',
     borderRadius: 4,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center"
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   btnText: {
-    color: "white",
+    color: 'white',
     fontSize: 15,
     fontFamily: Fonts.app_font,
 
-    textAlign: "center"
-  }
+    textAlign: 'center',
+  },
 });
 
 export default ViewAll;

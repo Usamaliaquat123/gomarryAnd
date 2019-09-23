@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, {Component} from 'react';
 
 import {
   BackHandler,
@@ -7,23 +7,23 @@ import {
   FlatList,
   TouchableOpacity,
   Text,
-  ToastAndroid,
-  ScrollView
-} from "react-native";
-import { NavigationActions } from "react-navigation";
+  ScrollView,
+} from 'react-native';
+import {NavigationActions} from 'react-navigation';
+import Toast from 'react-native-root-toast';
 
-import { Icon, ListItem } from "react-native-elements";
-import AnimatedLoader from "react-native-animated-loader";
-import LinearGradient from "react-native-linear-gradient";
-import Api from "../../../Services/Api";
-import IdentifiedPicker from "../../../Components/IdentifiedPicker";
-import IdentifiedInput from "../../../Components/IdentifiedInput";
-import CommonHeaderBack from "../../../Components/CommonHeaderBack";
+import {Icon, ListItem} from 'react-native-elements';
+import AnimatedLoader from 'react-native-animated-loader';
+import LinearGradient from 'react-native-linear-gradient';
+import Api from '../../../Services/Api';
+import IdentifiedPicker from '../../../Components/IdentifiedPicker';
+import IdentifiedInput from '../../../Components/IdentifiedInput';
+import CommonHeaderBack from '../../../Components/CommonHeaderBack';
 
 // Styles
-import styles from "./SignupStage2ScreenStyle";
-import colors from "../../../Themes/Colors";
-import { Colors, Fonts, Json } from "../../../Themes";
+import styles from './SignupStage2ScreenStyle';
+import colors from '../../../Themes/Colors';
+import {Colors, Fonts, Json} from '../../../Themes';
 
 export default class SignupStage2Screen extends Component {
   constructor(props) {
@@ -31,9 +31,9 @@ export default class SignupStage2Screen extends Component {
 
     this.attributes = global.attributes;
 
-    delete this.attributes["dob"];
+    delete this.attributes['dob'];
 
-    delete this.attributes["gender"];
+    delete this.attributes['gender'];
 
     var s = null;
 
@@ -56,24 +56,24 @@ export default class SignupStage2Screen extends Component {
     if (global.user.meta.location_raw != 1) {
       suggestions.push({
         id: global.user.meta.location_raw,
-        string: global.user.meta.location
+        string: global.user.meta.location,
       });
     }
 
     this.state = {
-      searchResult: "",
+      searchResult: '',
 
       loading: false,
 
       section: s,
 
       update: {},
-      locationSuggestions: suggestions
+      locationSuggestions: suggestions,
     };
   }
 
   componentDidMount() {
-    BackHandler.addEventListener("hardwareBackPress", () => {
+    BackHandler.addEventListener('hardwareBackPress', () => {
       this.goBack();
 
       return true;
@@ -84,21 +84,24 @@ export default class SignupStage2Screen extends Component {
     var i = global.sections.indexOf(this.state.section);
 
     if (i < 1) {
-      this.props.navigation.navigate("SignupStage1Screen");
+      this.props.navigation.navigate('SignupStage1Screen');
     } else {
-      this.setState({ section: global.sections[i - 1] });
+      this.setState({section: global.sections[i - 1]});
     }
   };
 
   handleNext = () => {
     if (this.state.loading) return;
-    this.setState({ loading: true });
-    if (this.state.section == "location") {
+    this.setState({loading: true});
+    if (this.state.section == 'location') {
       if (global.user.meta.location_raw > 1) {
-        this.setState({ section: "basic", loading: false });
+        this.setState({section: 'basic', loading: false});
       } else {
-        this.setState({ loading: false });
-        ToastAndroid.show(error, ToastAndroid.LONG);
+        this.setState({loading: false});
+        Toast.show(error, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        });
       }
       return;
     }
@@ -116,9 +119,9 @@ export default class SignupStage2Screen extends Component {
 
       if (!attribute.profile.enabled) continue;
 
-      if (attribute.profile.inputType == "select") {
+      if (attribute.profile.inputType == 'select') {
         update[attribute.key] =
-          global.user.data.profile[this.state.section]["_" + attribute.key];
+          global.user.data.profile[this.state.section]['_' + attribute.key];
       } else {
         update[attribute.key] =
           global.user.data.profile[this.state.section][attribute.key];
@@ -131,9 +134,11 @@ export default class SignupStage2Screen extends Component {
       // alert('Please fill in all fields.');
 
       // Todo error
-      this.setState({ loading: false });
-      ToastAndroid.show("Please fill all fields.", ToastAndroid.LONG);
-
+      this.setState({loading: false});
+      Toast.show('Please fill all fields.', {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.BOTTOM,
+      });
       return;
     }
 
@@ -147,25 +152,31 @@ export default class SignupStage2Screen extends Component {
               this.props.navigation.reset(
                 [
                   NavigationActions.navigate({
-                    routeName: "SignupScreen",
-                    params: { currentPage: 5 }
-                  })
+                    routeName: 'SignupScreen',
+                    params: {currentPage: 5},
+                  }),
                 ],
-                0
+                0,
               );
             })
             .catch(error => {
-              ToastAndroid.show(error, ToastAndroid.LONG);
+              Toast.show(error, {
+                duration: Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+              });
             });
         } else {
-          this.setState({ section: s });
+          this.setState({section: s});
         }
       })
       .catch(error => {
-        ToastAndroid.show(error, ToastAndroid.LONG);
+        Toast.show(error, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        });
       })
       .finally(() => {
-        this.setState({ loading: false });
+        this.setState({loading: false});
       });
   };
 
@@ -185,7 +196,7 @@ export default class SignupStage2Screen extends Component {
     var currentSection = null;
     for (var s = 0; s < global.sections.length; s++) {
       var section = global.sections[s];
-      if (section == "location") {
+      if (section == 'location') {
         if (global.user.meta.location_raw == 1) {
           currentSection = section;
           break;
@@ -223,13 +234,16 @@ export default class SignupStage2Screen extends Component {
       .then(data => {
         if (data.suggestions.length == 0)
           this.setState({
-            searchResult: "This city or country was not found."
+            searchResult: 'This city or country was not found.',
           });
-        else this.setState({ searchResult: "" });
-        this.setState({ locationSuggestions: data.suggestions });
+        else this.setState({searchResult: ''});
+        this.setState({locationSuggestions: data.suggestions});
       })
       .catch(error => {
-        ToastAndroid.show(error, ToastAndroid.LONG);
+        Toast.show(error, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        });
       })
       .finally(() => {
         // this.setState({ loading: false });
@@ -237,21 +251,24 @@ export default class SignupStage2Screen extends Component {
   }
 
   setLocation = (id, string) => {
-    this.setState({ loading: true });
+    this.setState({loading: true});
 
-    Api.updateProfile(this.state.section, { location: id })
+    Api.updateProfile(this.state.section, {location: id})
       .then(data => {
         global.user.meta.location_raw = id;
 
         global.user.meta.location = string;
 
-        this.setState({ section: "basic" });
+        this.setState({section: 'basic'});
       })
       .catch(error => {
-        ToastAndroid.show(error, ToastAndroid.LONG);
+        Toast.show(error, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        });
       })
       .finally(() => {
-        this.setState({ loading: false });
+        this.setState({loading: false});
       });
   };
 
@@ -263,11 +280,11 @@ export default class SignupStage2Screen extends Component {
   handleOnValueChange = (itemValue, itemIndex, id) => {
     global.user.data.profile[this.state.section][id] = itemValue;
 
-    global.user.data.profile[this.state.section]["_" + id] = itemValue;
+    global.user.data.profile[this.state.section]['_' + id] = itemValue;
 
     this.forceUpdate();
   };
-  renderRow = ({ item }) => (
+  renderRow = ({item}) => (
     <View>
       <ListItem
         leftIcon={() => (
@@ -286,10 +303,10 @@ export default class SignupStage2Screen extends Component {
 
   render() {
     var form = [];
-    const { section } = this.state;
-    if (section == "location") {
+    const {section} = this.state;
+    if (section == 'location') {
       form.push(
-        <View key="location" style={{ marginBottom: 15 }}>
+        <View key="location" style={{marginBottom: 15}}>
           <View>
             <View style={styles.headerLogoStyle}>
               <Icon
@@ -307,22 +324,21 @@ export default class SignupStage2Screen extends Component {
               placeholder="Search"
               placeholderTextColor="#757575"
               underlineColorAndroid={Colors.mainAppColor}
-              autoCapitalize={"none"}
+              autoCapitalize={'none'}
               autoCorrect={false}
               onChangeText={search => this.searchForLocation(search)}
               value={this.state.search}
             />
-            <View style={{ marginTop: -1 }}>
-              {this.state.searchResult != "" && (
+            <View style={{marginTop: -1}}>
+              {this.state.searchResult != '' && (
                 <View>
                   <Text
                     style={{
-                      textAlign: "center",
+                      textAlign: 'center',
                       fontSize: 13,
                       fontFamily: Fonts.LatoRegular,
-                      color: Colors.mainAppColor
-                    }}
-                  >
+                      color: Colors.mainAppColor,
+                    }}>
                     {this.state.searchResult}
                   </Text>
                 </View>
@@ -335,7 +351,7 @@ export default class SignupStage2Screen extends Component {
               />
             </View>
           </View>
-        </View>
+        </View>,
       );
     } else {
       for (var k in this.attributes) {
@@ -348,9 +364,9 @@ export default class SignupStage2Screen extends Component {
         if (!attribute.profile.enabled) continue;
 
         switch (attribute.profile.inputType) {
-          case "text":
+          case 'text':
             form.push(
-              <View key={attribute.key} style={{ marginBottom: 15 }}>
+              <View key={attribute.key} style={{marginBottom: 15}}>
                 <Text style={styles.titlt}>{attribute.title}</Text>
                 <View style={styles.TextAreaView}>
                   <IdentifiedInput
@@ -366,12 +382,12 @@ export default class SignupStage2Screen extends Component {
                     underlineColorAndroid="transparent"
                   />
                 </View>
-              </View>
+              </View>,
             );
 
             break;
 
-          case "select":
+          case 'select':
             var options = [];
 
             for (var v in attribute.options) {
@@ -379,7 +395,7 @@ export default class SignupStage2Screen extends Component {
 
               var option = attribute.options[v];
 
-              if (typeof option === "object") {
+              if (typeof option === 'object') {
                 for (var sv in option) {
                   if (!option.hasOwnProperty(sv)) continue;
 
@@ -390,49 +406,47 @@ export default class SignupStage2Screen extends Component {
                       key={sv}
                       label={suboption}
                       value={sv}
-                    />
+                    />,
                   );
                 }
               } else {
                 options.push(
-                  <IdentifiedPicker.Item key={v} label={option} value={v} />
+                  <IdentifiedPicker.Item key={v} label={option} value={v} />,
                 );
               }
             }
 
             form.push(
-              <View key={attribute.key} style={{ marginBottom: 15 }}>
+              <View key={attribute.key} style={{marginBottom: 15}}>
                 <Text style={styles.titlt}>{attribute.title}</Text>
                 <View style={styles.PickerView}>
                   <IdentifiedPicker
                     id={attribute.key}
                     selectedValue={
-                      global.user.data.profile[section]["_" + attribute.key]
+                      global.user.data.profile[section]['_' + attribute.key]
                     }
-                    onValueChange={this.handleOnValueChange}
-                  >
+                    onValueChange={this.handleOnValueChange}>
                     <IdentifiedPicker.Item label="-----" value="" />
 
                     {options}
                   </IdentifiedPicker>
                 </View>
-              </View>
+              </View>,
             );
 
             break;
 
-          case "textarea":
+          case 'textarea':
             form.push(
-              <View key={attribute.key} style={{ marginBottom: 15 }}>
+              <View key={attribute.key} style={{marginBottom: 15}}>
                 <Text style={styles.titlt}>{attribute.title}</Text>
                 <View
                   style={{
                     borderWidth: 0,
                     borderBottomWidth: 1,
                     borderColor: colors.mainAppColor,
-                    borderRadius: 5
-                  }}
-                >
+                    borderRadius: 5,
+                  }}>
                   <IdentifiedInput
                     id={attribute.key}
                     value={global.user.data.profile[section][attribute.key]}
@@ -443,11 +457,11 @@ export default class SignupStage2Screen extends Component {
                     autoCorrect={false}
                     underlineColorAndroid="transparent"
                     multiline={true}
-                    style={{ height: 100, textAlignVertical: "top" }}
+                    style={{height: 100, textAlignVertical: 'top'}}
                     multiline={true}
                   />
                 </View>
-              </View>
+              </View>,
             );
 
             break;
@@ -456,7 +470,7 @@ export default class SignupStage2Screen extends Component {
             form.push(
               <View key={attribute.key}>
                 <Text style={styles.titlt}>Unknown: {attribute.title}</Text>
-              </View>
+              </View>,
             );
 
             break;
@@ -465,14 +479,13 @@ export default class SignupStage2Screen extends Component {
       form.push(
         <TouchableOpacity style={styles.Touchable} onPress={this.handleNext}>
           <LinearGradient
-            colors={["#FC3838", "#F52B43", "#ED0D51"]}
-            start={{ x: 0.7, y: 1.2 }}
-            end={{ x: 0.0, y: 0.7 }}
-            style={styles.Linear}
-          >
+            colors={['#FC3838', '#F52B43', '#ED0D51']}
+            start={{x: 0.7, y: 1.2}}
+            end={{x: 0.0, y: 0.7}}
+            style={styles.Linear}>
             <Text style={styles.LinearText}>Next</Text>
           </LinearGradient>
-        </TouchableOpacity>
+        </TouchableOpacity>,
       );
     }
 
@@ -480,12 +493,12 @@ export default class SignupStage2Screen extends Component {
       <React.Fragment>
         <CommonHeaderBack title={section.toUpperCase()} logout={true} />
 
-        <ScrollView style={{ margin: 10 }}>{form}</ScrollView>
+        <ScrollView style={{margin: 10}}>{form}</ScrollView>
 
         <AnimatedLoader
           visible={this.state.loading}
           source={Json.like}
-          animationStyle={{ width: 100, height: 100 }}
+          animationStyle={{width: 100, height: 100}}
         />
       </React.Fragment>
     );

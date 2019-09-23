@@ -1,7 +1,8 @@
 import React from "react";
-import { createBottomTabNavigator, TabBarBottom } from "react-navigation";
+// import {  TabBarBottom } from "react-navigation";
 import { Icon } from "react-native-elements";
 import { View } from "react-native";
+import { createBottomTabNavigator, TabBarBottom } from "react-navigation-tabs";
 
 import MyProfileScreen from "../UserProfile/MyProfileScreen";
 import DashboardScreen from "../Home/DashboardScreen";

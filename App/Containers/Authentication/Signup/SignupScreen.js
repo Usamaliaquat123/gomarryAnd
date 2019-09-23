@@ -1,59 +1,40 @@
-import React, { Component } from "react";
+import React, {Component} from 'react';
 import {
   View,
   TextInput,
   Text,
   TouchableOpacity,
-  DatePickerIOS,
-  DatePickerAndroid,
-  Platform,
-  ToastAndroid,
-  Picker
-} from "react-native";
-import ProgressBar from "react-native-progress/Bar";
-import { NavigationActions } from "react-navigation";
-import AsyncStorage from "@react-native-community/async-storage";
-import moment from "moment";
-import LinearGradient from "react-native-linear-gradient";
-import PasswordInputText from "../../../Components/PasswordInput/PasswordInput";
-import Api from "../../../Services/Api";
-import { ScrollView } from "react-native-gesture-handler";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Feather from "react-native-vector-icons/Feather";
-import ImagePicker from "react-native-image-crop-picker";
+  StyleSheet,
+} from 'react-native';
+import Toast from 'react-native-root-toast';
 
-import { ViewPager } from "rn-viewpager";
-import { Icon } from "react-native-elements";
-import { Images, Colors, Fonts, Json } from "../../../Themes";
-import StepIndicator from "react-native-step-indicator";
-import Modal from "react-native-modalbox";
-import { Upload } from "react-native-tus-client";
-import ActionSheet from "react-native-actionsheet";
-import AnimatedLoader from "react-native-animated-loader";
+import ProgressBar from 'react-native-progress/Bar';
+import {NavigationActions} from 'react-navigation';
+import AsyncStorage from '@react-native-community/async-storage';
+import moment from 'moment';
+import LinearGradient from 'react-native-linear-gradient';
+import PasswordInputText from '../../../Components/PasswordInput/PasswordInput';
+import Api from '../../../Services/Api';
+import {ScrollView} from 'react-native-gesture-handler';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import RNPickerSelect from 'react-native-picker-select';
+import DatePicker from 'react-native-datepicker';
+
+import tus from 'tus-js-client';
+import ImagePicker from 'react-native-image-picker';
+
+import {ViewPager} from 'rn-viewpager';
+import {Icon} from 'react-native-elements';
+import {Images, Colors, Fonts, Json} from '../../../Themes';
+import StepIndicator from 'react-native-step-indicator';
+import Modal from 'react-native-modalbox';
+import AnimatedLoader from 'react-native-animated-loader';
 // Styles
-import styles from "./SignupScreenStyle";
-import { Image } from "react-native";
-import { stepIdicator } from "../../../Components/ConstantList";
-import CommonHeaderBack from "../../../Components/CommonHeaderBack";
+import styles from './SignupScreenStyle';
+import {Image} from 'react-native';
+import {stepIdicator} from '../../../Components/ConstantList';
+import CommonHeaderBack from '../../../Components/CommonHeaderBack';
 
-const optionsOfImageType = [
-  <Feather
-    name="image"
-    size={20}
-    color={Colors.mainAppColor}
-    style={styles.actionIcon}
-  >
-    <Text style={styles.actionText}>Select Image</Text>
-  </Feather>,
-  <Feather
-    name="camera"
-    size={20}
-    color={Colors.mainAppColor}
-    style={styles.actionIcon}
-  >
-    <Text style={styles.actionText}>Camera</Text>
-  </Feather>
-];
 export default class SignupScreen extends Component {
   constructor(props) {
     super(props);
@@ -62,12 +43,11 @@ export default class SignupScreen extends Component {
     this.state = {
       //date
       chosenDate: new Date(),
-      androidDate: "",
       currentPage: 0,
       // Step 0
       iconVisible: false,
-      hearAboutUs: "",
-      lookingFor: "",
+      hearAboutUs: '',
+      lookingFor: '',
       gender: null,
       year: null,
       month: null,
@@ -78,67 +58,46 @@ export default class SignupScreen extends Component {
       password: null,
       discovery: null,
       // Step 1
-      username: "",
-      userTitle: "",
+      username: '',
+      userTitle: '',
       // Step 2
-      locationSuggestions: "",
-      searchResult: "",
+      locationSuggestions: '',
+      searchResult: '',
       //  ==> Personal Sections
       personalQueries: true,
 
       locationVisible: false,
       locationId: null,
       locationName: null,
-      userCurrentImage: "",
+      userCurrentImage: '',
       modalAlert: false,
-      errMsg: "",
+      errMsg: '',
 
       //stage 3
       uploadedBytes: 0,
       totalBytes: 0,
-      status: "no file selected"
+      file: null,
+      status: 'no file selected',
     };
   }
 
-  setDate(newDate) {
+  setDate = newDate => {
+    let {chosenDate} = this.state;
     this.setState({
       chosenDate: newDate,
-      day: moment(chosenDate).format("d"),
-      year: moment(chosenDate).format("YYYY"),
-      month: moment(chosenDate).format("MM")
+      day: moment(chosenDate).format('d'),
+      year: moment(chosenDate).format('YYYY'),
+      month: moment(chosenDate).format('MM'),
     });
-  }
-
-  setDateAndroid = async () => {
-    let date = new Date();
-    let validDate = moment(date).format("YYYY") - 18;
-    console.log(validDate);
-    try {
-      const { action, year, month, day } = await DatePickerAndroid.open({
-        date: date,
-
-        maxDate: new Date(validDate, 11, 31)
-      });
-      if (action !== DatePickerAndroid.dismissedAction) {
-        this.setState({
-          androidDate: `${day}/${month + 1}/${year}`,
-          day,
-          month: month + 1,
-          year
-        });
-      }
-    } catch ({ code, message }) {
-      console.warn("Cannot open date picker", message);
-    }
   };
 
   componentWillMount() {
     let currentPage = this.props.navigation.state.params.currentPage;
     if (currentPage == 0) {
-      this.setState({ currentPage: 0 });
-      AsyncStorage.removeItem("token");
+      this.setState({currentPage: 0});
+      AsyncStorage.removeItem('token');
     }
-    this.setState({ currentPage });
+    this.setState({currentPage});
   }
 
   // //////////////////////////////////////////////////////////////////////////
@@ -148,94 +107,73 @@ export default class SignupScreen extends Component {
   ////////////////////////////////////////////////////////////////////////////
 
   uploadImageThroughTusClient = async () => {
+    const {file} = this.state;
     this.refs.lert.open();
-
-    const file = this.state.userCurrentImage.substr(8);
-    const extension = this.getFileExtension(file);
-
-    const upload = new Upload(file, {
-      headers: { "X-Auth-Token": token },
+    const upload = new tus.Upload(file, {
+      headers: {'X-Auth-Token': token},
       endpoint: `${Api._base}/api/uploadPicture`, // use goMarry tus server endpoint instead
       retryDelays: [0, 1000, 3000, 5000],
       metadata: {
-        filename: `${new Date().valueOf()}.${extension}`,
-        filetype: this.getMimeType(extension)
+        filename: file.fileName,
+        filetype: file.filetype,
       },
       onError: error => {
         this.setState({
-          status: `upload failed ${error}`
+          status: `upload failed ${error}`,
         });
-        ImagePicker.clean();
-
-        ToastAndroid.show(
-          `Something is wrong please try again`,
-          ToastAndroid.LONG
-        );
+        Toast.show(error, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        });
       },
       onProgress: (uploadedBytes, totalBytes) => {
         this.setState({
           totalBytes: totalBytes,
           uploadedBytes: uploadedBytes,
-          progress: uploadedBytes / totalBytes
+          progress: uploadedBytes / totalBytes,
         });
       },
       onSuccess: () => {
         this.setState({
-          status: "upload finished"
+          status: 'upload finished',
         });
-        ImagePicker.clean();
         this.refs.lert.close();
-
-        ToastAndroid.show(`Uploading is done`, ToastAndroid.LONG);
+        Toast.show(`Uploading is done`, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        });
         Api.completeSignupStage3()
           .then(data => {
             this.refs.congragulationsAlert.open();
           })
-          .catch(error => ToastAndroid.show(error, ToastAndroid.LONG));
-      }
+          .catch(error =>
+            Toast.show(error, {
+              duration: Toast.durations.LONG,
+              position: Toast.positions.BOTTOM,
+            }),
+          );
+      },
     });
     upload.start();
   };
 
-  getFileExtension(uri) {
-    const match = /\.([a-zA-Z]+)$/.exec(uri);
-    if (match !== null) {
-      return match[1];
-    }
-    return "";
-  }
-
-  getMimeType(extension) {
-    if (extension === "jpg") return "image/jpeg";
-    return `image/${extension}`;
-  }
-
-  openImagePickerAndCropper = async () => {
-    ImagePicker.openPicker({})
-      .then(result => {
-        if (!result.cancelled) {
-          if (result.mime === "image/jpeg")
-            this.setState({ userCurrentImage: result.path });
-          else ToastAndroid.show(`Please Select Image`, ToastAndroid.LONG);
-        }
-      })
-      .catch(err => {
-        console.log(err.toString());
+  openImagePicker = async () => {
+    ImagePicker.openPicker({}, result => {
+      if (!result.cancelled) {
+        if (result.type === 'image/jpeg')
+          this.setState({file: result, userCurrentImage: result.uri});
+        else
+          Toast.show(`Please Select Image`, {
+            duration: Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+          });
+      }
+    }).catch(err => {
+      Toast.show(err, {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.BOTTOM,
       });
-  };
-
-  caprtureImageAndCropper = async () => {
-    ImagePicker.openCamera({})
-      .then(result => {
-        if (!result.cancelled) {
-          if (result.mime === "image/jpeg")
-            this.setState({ userCurrentImage: result.path });
-          else ToastAndroid.show(`Please Select Image`, ToastAndroid.LONG);
-        }
-      })
-      .catch(err => {
-        console.log(err.toString());
-      });
+    });
   };
   // //////////////////////////////////////////////////////////////////////////
 
@@ -244,83 +182,92 @@ export default class SignupScreen extends Component {
   ////////////////////////////////////////////////////////////////////////////
 
   firstHandlePressNext = () => {
-    this.setState({ iconVisible: true });
+    this.setState({iconVisible: true});
     try {
-      const {
-        gender,
-        month,
-        day,
-        year,
-        email,
-        password,
-        discovery
-      } = this.state;
+      const {gender, month, day, year, email, password, discovery} = this.state;
       Api.register(gender, month, day, year, email, password, discovery)
         .then(async data => {
           if (global.token) {
-            this.setState({ iconVisible: false, currentPage: 1 });
+            this.setState({iconVisible: false, currentPage: 1});
           } else {
-            this.setState({ iconVisible: false });
-            ToastAndroid.show(
-              "You may type worng credientials or you may need to restart your app ",
-              ToastAndroid.LONG
+            this.setState({iconVisible: false});
+            Toast.show(
+              'You may type worng credientials or you may need to restart your app ',
+              {
+                duration: Toast.durations.LONG,
+                position: Toast.positions.BOTTOM,
+              },
             );
           }
         })
         .catch(error => {
-          ToastAndroid.show(error, ToastAndroid.LONG);
+          Toast.show(error, {
+            duration: Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+          });
         })
         .finally(() => {
-          this.setState({ iconVisible: false });
+          this.setState({iconVisible: false});
         });
     } catch (error) {
-      ToastAndroid.show(error, ToastAndroid.LONG);
+      Toast.show(error, {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.BOTTOM,
+      });
     }
   };
 
   SecondHandlePressNext = () => {
     try {
-      if (this.state.username != "" || this.state.userTitle != "") {
-        this.setState({ iconVisible: true });
+      if (this.state.username != '' || this.state.userTitle != '') {
+        this.setState({iconVisible: true});
         Api.completeSignupStage1(this.state.username, this.state.userTitle)
           .then(() => {
-            this.setState({ iconVisible: false });
+            this.setState({iconVisible: false});
             global.user.meta.username = this.state.username;
             global.user.meta.tagline = this.state.userTitle;
-            this.props.navigation.navigate("SignupStage2Screen");
+            this.props.navigation.navigate('SignupStage2Screen');
           })
           .catch(error => {
-            ToastAndroid.show(error, ToastAndroid.LONG);
-            this.setState({ iconVisible: false });
+            Toast.show(error, {
+              duration: Toast.durations.LONG,
+              position: Toast.positions.BOTTOM,
+            }),
+              this.setState({iconVisible: false});
           })
           .finally(() => {
-            this.setState({ iconVisible: false });
+            this.setState({iconVisible: false});
           });
       } else {
-        ToastAndroid.show("Type username and tagname", ToastAndroid.LONG);
+        Toast.show('Type username and tagname', {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        });
       }
-    } catch (e) {
-      ToastAndroid.show(e, ToastAndroid.LONG);
+    } catch (error) {
+      Toast.show(error, {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.BOTTOM,
+      });
     }
   };
 
   async signupCompleteScreenClicked() {
-    this.setState({ currentPage: 3 });
+    this.setState({currentPage: 3});
   }
 
   render() {
-    const { androidDate, currentPage, userCurrentImage } = this.state;
+    const {currentPage, userCurrentImage} = this.state;
     return (
       <>
         <CommonHeaderBack logout={true} />
 
         <ScrollView
-          style={{ backgroundColor: "white" }}
-          showsVerticalScrollIndicator={false}
-        >
+          style={{backgroundColor: 'white'}}
+          showsVerticalScrollIndicator={false}>
           <View style={styles.containerSignup}>
             <KeyboardAwareScrollView style={styles.form}>
-              <View style={{ marginTop: 10 }}>
+              <View style={{marginTop: 10}}>
                 <StepIndicator
                   customStyles={stepIdicator}
                   currentPosition={currentPage}
@@ -329,12 +276,12 @@ export default class SignupScreen extends Component {
               </View>
 
               <ViewPager
-                style={{ flexGrow: 1 }}
+                style={{flexGrow: 1}}
                 ref={viewPager => {
                   this.viewPager = viewPager;
                 }}
                 onPageSelected={page => {
-                  this.setState({ currentPage: page.position });
+                  this.setState({currentPage: page.position});
                 }}
                 // renderPage={this._renderPage}
               />
@@ -364,95 +311,108 @@ export default class SignupScreen extends Component {
                   <Text style={styles.heading}>
                     Type Your basic information and continue to next step
                   </Text>
-                  <View style={styles.InputView}>
-                    <Picker
-                      selectedValue={this.state.gender}
-                      onValueChange={(itemValue, itemIndex) =>
-                        this.setState({ gender: itemValue })
-                      }
-                    >
-                      <Picker.Item label="I'm Looking For" value="" />
-                      <Picker.Item label="A man seeking a wife" value="1" />
-                      <Picker.Item
-                        label="A woman seeking a husband"
-                        value="2"
-                      />
-                    </Picker>
-                  </View>
 
-                  {Platform.OS === "ios" ? (
-                    <DatePickerIOS
-                      date={chosenDate}
+                  <RNPickerSelect
+                    style={pickerSelectStyles}
+                    placeholder={{label: "I'm Looking For", value: ''}}
+                    onValueChange={value => this.setState({gender: value})}
+                    items={[
+                      {label: 'A man seeking a wife', value: 1},
+                      {label: 'A woman seeking a husband', value: '2'},
+                    ]}
+                  />
+
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      margin: 15,
+                    }}>
+                    <Text
+                      style={[
+                        {
+                          alignSelf: 'center',
+                          textAlign: 'center',
+                          fontFamily: Fonts.LatoBold,
+                          fontSize: 18,
+                        },
+                      ]}>
+                      I was born in
+                    </Text>
+                    <DatePicker
+                      date={this.state.chosenDate}
+                      mode="date"
+                      placeholder="select date"
+                      format="YYYY-MM-DD"
+                      // minDate="2016-05-01"
+                      maxDate={new Date()}
+                      confirmBtnText="Confirm"
+                      cancelBtnText="Cancel"
+                      customStyles={{
+                        dateIcon: {
+                          position: 'absolute',
+                          left: 0,
+                          top: 4,
+                          marginLeft: 0,
+                        },
+                        dateInput: {
+                          marginLeft: 36,
+                        },
+                        // ... You can check the source to find the other keys.
+                      }}
                       onDateChange={this.setDate}
                     />
-                  ) : (
-                    <View style={styles.dateView}>
-                      <Text
-                        style={[{ fontFamily: Fonts.LatoBold, fontSize: 18 }]}
-                      >
-                        {androidDate === "" ? "I was born in" : androidDate}
-                      </Text>
-                      <Icon
-                        name="calendar"
-                        type="simple-line-icon"
-                        size={30}
-                        color={Colors.mainAppColor}
-                        onPress={() => this.setDateAndroid()}
-                      />
-                    </View>
-                  )}
+                  </View>
                   <TextInput
                     style={[
                       styles.textInput,
-                      !this.state.validated ? styles.error : null
+                      !this.state.validated ? styles.error : null,
                     ]}
                     placeholder="Email"
                     placeholderTextColor="#757575"
-                    underlineColorAndroid={Colors.mainAppColor}
-                    keyboardType={"email-address"}
-                    autoCapitalize={"none"}
+                    keyboardType={'email-address'}
+                    autoCapitalize={'none'}
                     autoCorrect={false}
-                    onChangeText={email => this.setState({ email })}
+                    onChangeText={email => this.setState({email})}
                     value={this.state.email}
                   />
                   <PasswordInputText
-                    placeholder={"*******"}
+                    placeholder={'*******'}
                     style={[
                       styles.textInput,
-                      !this.state.passwordvalidation ? styles.error : null
+                      !this.state.passwordvalidation ? styles.error : null,
                     ]}
                     value={this.state.password}
-                    onChangeText={password => this.setState({ password })}
+                    onChangeText={password => this.setState({password})}
                   />
 
-                  <View style={styles.InputView}>
-                    <Picker
-                      selectedValue={this.state.discovery}
-                      onValueChange={(itemValue, itemIndex) =>
-                        this.setState({ discovery: itemValue })
-                      }
-                    >
-                      <Picker.Item label="How did you hear about us" value="" />
-                      <Picker.Item label="Friend" value="friend" />
-                      <Picker.Item label="Social" value="social" />
-                      <Picker.Item label="Search" value="search" />
-                      <Picker.Item label="Adwords" value="adwords" />
-                      <Picker.Item label="Youtube" value="youtube" />
-                      <Picker.Item label="Radio" value="radio" />
-                      <Picker.Item label="Press" value="press" />
-                      <Picker.Item label="Other" value="other" />
-                    </Picker>
-                  </View>
+                  <RNPickerSelect
+                    style={pickerSelectStyles}
+                    placeholder={{
+                      label: 'How did you hear about us',
+                      value: '',
+                    }}
+                    onValueChange={value => this.setState({gender: value})}
+                    items={[
+                      {label: 'How did you hear about us', value: ''},
+                      {label: 'Friend', value: 'friend'},
+                      {label: 'Social', value: 'social'},
+                      {label: 'Search', value: 'search'},
+                      {label: 'Adwords', value: 'adwords'},
+                      {label: 'Youtube', value: 'youtube'},
+                      {label: 'Radio', value: 'radio'},
+                      {label: 'Press', value: 'press'},
+                      {label: 'Other', value: 'other'},
+                    ]}
+                  />
                   <TouchableOpacity
                     style={styles.signupButton}
-                    onPress={this.firstHandlePressNext}
-                  >
+                    onPress={this.firstHandlePressNext}>
                     <LinearGradient
-                      colors={["#FC3838", "#F52B43", "#ED0D51"]}
-                      start={{ x: 0.7, y: 1.2 }}
-                      end={{ x: 0.0, y: 0.7 }}
-                      style={styles.LinearGradient}
-                    >
+                      colors={['#FC3838', '#F52B43', '#ED0D51']}
+                      start={{x: 0.7, y: 1.2}}
+                      end={{x: 0.0, y: 0.7}}
+                      style={styles.LinearGradient}>
                       <Text style={styles.LinearGradientText}>
                         Continue to the next step
                       </Text>
@@ -472,8 +432,8 @@ export default class SignupScreen extends Component {
               {/* ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */}
               {/* ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */}
               {currentPage == 1 &&
-                this.props.navigation.navigate("VerifyEmail", {
-                  Email: this.state.email
+                this.props.navigation.navigate('VerifyEmail', {
+                  Email: this.state.email,
                 })}
 
               {/* ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */}
@@ -501,14 +461,12 @@ export default class SignupScreen extends Component {
 
                   <TouchableOpacity
                     style={styles.signupButton}
-                    onPress={() => this.signupCompleteScreenClicked()}
-                  >
+                    onPress={() => this.signupCompleteScreenClicked()}>
                     <LinearGradient
-                      colors={["#FC3838", "#F52B43", "#ED0D51"]}
-                      start={{ x: 0.7, y: 1.2 }}
-                      end={{ x: 0.0, y: 0.7 }}
-                      style={styles.LinearGradient}
-                    >
+                      colors={['#FC3838', '#F52B43', '#ED0D51']}
+                      start={{x: 0.7, y: 1.2}}
+                      end={{x: 0.0, y: 0.7}}
+                      style={styles.LinearGradient}>
                       <Text style={styles.LinearGradientText}>
                         Setting up your profile..!
                       </Text>
@@ -536,43 +494,41 @@ export default class SignupScreen extends Component {
                   <TextInput
                     style={[
                       styles.textInputOfUserName,
-                      !this.state.validated ? styles.error : null
+                      !this.state.validated ? styles.error : null,
                     ]}
                     placeholder="Username"
                     placeholderTextColor="#757575"
                     underlineColorAndroid={Colors.mainAppColor}
-                    autoCapitalize={"none"}
+                    autoCapitalize={'none'}
                     autoCorrect={false}
-                    onChangeText={username => this.setState({ username })}
+                    onChangeText={username => this.setState({username})}
                     value={this.state.username}
                   />
-                  <Text style={[styles.heading, { marginTop: 10 }]}>
+                  <Text style={[styles.heading, {marginTop: 10}]}>
                     Say something to grap people attention
                   </Text>
                   <TextInput
                     style={[
                       styles.textInput,
-                      !this.state.validated ? styles.error : null
+                      !this.state.validated ? styles.error : null,
                     ]}
                     placeholder="Say something about your title"
                     placeholderTextColor="#757575"
                     underlineColorAndroid={Colors.mainAppColor}
-                    autoCapitalize={"none"}
+                    autoCapitalize={'none'}
                     autoCorrect={false}
-                    onChangeText={userTitle => this.setState({ userTitle })}
+                    onChangeText={userTitle => this.setState({userTitle})}
                     value={this.state.userTitle}
                   />
                   <View>
                     <TouchableOpacity
                       style={styles.signupButton}
-                      onPress={this.SecondHandlePressNext}
-                    >
+                      onPress={this.SecondHandlePressNext}>
                       <LinearGradient
-                        colors={["#FC3838", "#F52B43", "#ED0D51"]}
-                        start={{ x: 0.7, y: 1.2 }}
-                        end={{ x: 0.0, y: 0.7 }}
-                        style={styles.LinearGradient}
-                      >
+                        colors={['#FC3838', '#F52B43', '#ED0D51']}
+                        start={{x: 0.7, y: 1.2}}
+                        end={{x: 0.0, y: 0.7}}
+                        style={styles.LinearGradient}>
                         <Text style={styles.LinearGradientText}>
                           Continue to the next step
                         </Text>
@@ -609,112 +565,82 @@ export default class SignupScreen extends Component {
 
                   <View
                     style={{
-                      justifyContent: "center",
-                      alignItems: "center",
-                      marginTop: 10
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => this.actionSheetOfImagePickerType.show()}
-                    >
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginTop: 10,
+                    }}>
+                    <TouchableOpacity onPress={() => this.openImagePicker()}>
                       <Image
                         style={{
                           height: 200,
                           width: 200,
                           borderRadius: 100,
-                          marginBottom: 20
+                          marginBottom: 20,
                         }}
                         resizeMode="cover"
                         source={
-                          userCurrentImage == ""
+                          userCurrentImage == ''
                             ? Images.uploadProfile
-                            : { uri: userCurrentImage }
+                            : {uri: userCurrentImage}
                         }
                       />
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      style={[styles.signupButton, { marginTop: 80 }]}
+                      style={[styles.signupButton, {marginTop: 80}]}
                       onPress={() => {
-                        if (userCurrentImage != "") {
+                        if (userCurrentImage != '') {
                           this.uploadImageThroughTusClient();
                         } else {
-                          this.actionSheetOfImagePickerType.show();
+                          this.openImagePicker();
                         }
-                      }}
-                    >
+                      }}>
                       <LinearGradient
-                        colors={["#FC3838", "#F52B43", "#ED0D51"]}
-                        start={{ x: 0.7, y: 1.2 }}
-                        end={{ x: 0.0, y: 0.7 }}
-                        style={styles.LinearGradient}
-                      >
+                        colors={['#FC3838', '#F52B43', '#ED0D51']}
+                        start={{x: 0.7, y: 1.2}}
+                        end={{x: 0.0, y: 0.7}}
+                        style={styles.LinearGradient}>
                         <Text style={styles.LinearGradientText}>
                           Upload your photo
                         </Text>
                       </LinearGradient>
                     </TouchableOpacity>
 
-                    <View style={{ marginTop: 15 }} />
+                    <View style={{marginTop: 15}} />
                   </View>
                 </View>
               )}
             </KeyboardAwareScrollView>
           </View>
-          <ActionSheet
-            ref={o => (this.actionSheetOfImagePickerType = o)}
-            title={
-              <Text
-                style={{
-                  color: "#000",
-                  fontFamily: Fonts.app_font,
-                  fontSize: 15,
-                  alignSelf: "flex-start",
-                  marginLeft: 10
-                }}
-              >
-                Select your image type
-              </Text>
-            }
-            options={optionsOfImageType}
-            onPress={e => {
-              if (e == 0) {
-                this.openImagePickerAndCropper();
-              } else {
-                this.caprtureImageAndCropper();
-              }
-            }}
-          />
+
           {/* uploading */}
           <Modal
             style={[styles.errAlert, styles.errAlert3]}
-            position={"center"}
-            ref={"lert"}
+            position={'center'}
+            ref={'lert'}
             backdrop={true}
             coverScreen={true}
-            backdropPressToClose={false}
-          >
+            backdropPressToClose={false}>
             <View>
-              <View style={{ alignItems: "center" }}>
+              <View style={{alignItems: 'center'}}>
                 <Icon
                   type="simple-line-icon"
                   name="arrow-up-circle"
                   size={50}
-                  color={"#00FF00"}
+                  color={'#00FF00'}
                 />
               </View>
-              <View style={{ alignItems: "center", margin: 10 }}>
+              <View style={{alignItems: 'center', margin: 10}}>
                 <Text
                   style={{
-                    textAlign: "center",
+                    textAlign: 'center',
                     fontFamily: Fonts.app_font,
-                    fontSize: 14
-                  }}
-                >
+                    fontSize: 14,
+                  }}>
                   Status: {this.state.status}
                 </Text>
               </View>
-              <View style={{ marginTop: 10, alignItems: "center" }}>
+              <View style={{marginTop: 10, alignItems: 'center'}}>
                 <ProgressBar
                   progress={this.state.progress}
                   color="#00FF00"
@@ -730,19 +656,17 @@ export default class SignupScreen extends Component {
           {/* Level 3 : last popup */}
           <Modal
             style={[styles.errAlert, styles.errAlert3]}
-            position={"center"}
-            ref={"congragulationsAlert"}
+            position={'center'}
+            ref={'congragulationsAlert'}
             backdrop={true}
             coverScreen={true}
-            backdropPressToClose={false}
-          >
+            backdropPressToClose={false}>
             <View>
               <View
                 style={{
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
                 <Icon
                   type="entypo"
                   name="heart-outlined"
@@ -750,34 +674,31 @@ export default class SignupScreen extends Component {
                   color={Colors.mainAppColor}
                 />
               </View>
-              <View
-                style={{ paddingLeft: 20, paddingRight: 10, paddingTop: 15 }}
-              >
-                <Text style={{ textAlign: "center", fontSize: 16 }}>
+              <View style={{paddingLeft: 20, paddingRight: 10, paddingTop: 15}}>
+                <Text style={{textAlign: 'center', fontSize: 16}}>
                   Congragulations ! You sucessfully registered you profile
                 </Text>
               </View>
-              <View style={{ marginTop: 10 }}>
+              <View style={{marginTop: 10}}>
                 <Text
                   onPress={() =>
                     this.props.navigation.reset(
                       [
                         NavigationActions.navigate({
-                          routeName: "HomeNavigation"
-                        })
+                          routeName: 'HomeNavigation',
+                        }),
                       ],
-                      0
+                      0,
                     )
                   }
                   style={{
                     color: Colors.mainAppColor,
-                    fontWeight: "bold",
-                    textAlign: "center",
+                    fontWeight: 'bold',
+                    textAlign: 'center',
                     fontFamily: Fonts.app_font,
 
-                    fontSize: 20
-                  }}
-                >
+                    fontSize: 20,
+                  }}>
                   Let Start !!
                 </Text>
               </View>
@@ -796,3 +717,25 @@ export default class SignupScreen extends Component {
     );
   }
 }
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: 'purple',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+});

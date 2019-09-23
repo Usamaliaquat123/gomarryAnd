@@ -1,38 +1,40 @@
-import React, { Component } from "react";
+import React, {Component} from 'react';
 import {
   BackHandler,
-  Picker,
   View,
   ScrollView,
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
-  ToastAndroid,
-  Text
-} from "react-native";
-import { CheckBox, Card, Icon } from "react-native-elements";
-import LinearGradient from "react-native-linear-gradient";
-import Api from "../../../Services/Api";
+  Text,
+  StyleSheet,
+} from 'react-native';
+import Toast from 'react-native-root-toast';
 
-import UserCard from "../../../Components/UserCard";
-import CommonHeader from "../../../Components/CommonHeader";
-import MoreOptionItem from "../../../Components/MoreOptionItem";
-import { age_range, distance_range } from "../../../Components/ConstantList";
+import {CheckBox, Card, Icon} from 'react-native-elements';
+import LinearGradient from 'react-native-linear-gradient';
+import Api from '../../../Services/Api';
+import RNPickerSelect from 'react-native-picker-select';
+
+import UserCard from '../../../Components/UserCard';
+import CommonHeader from '../../../Components/CommonHeader';
+import MoreOptionItem from '../../../Components/MoreOptionItem';
+import {age_range, distance_range} from '../../../Components/ConstantList';
 // Styles
-import Styles from "./SearchScreenStyle";
-import SampleUserCard from "../../../Components/SampleUserCard";
-import { Fonts } from "../../../Themes";
+import Styles from './SearchScreenStyle';
+import SampleUserCard from '../../../Components/SampleUserCard';
+import {Fonts, Colors} from '../../../Themes';
 
 export default class SearchScreen extends Component {
   static navigationOptions = {
-    title: "Search",
-    drawerIcon: ({ tintColor }) => (
+    title: 'Search',
+    drawerIcon: ({tintColor}) => (
       <Icon
         name="magnifier"
         type="simple-line-icon"
-        style={[{ color: tintColor }]}
+        style={[{color: tintColor}]}
       />
-    )
+    ),
   };
 
   constructor(props) {
@@ -76,7 +78,7 @@ export default class SearchScreen extends Component {
       selectedEye: [],
       selectedHair: [],
       selectedBody: [],
-      selectedHeight: []
+      selectedHeight: [],
     };
     this.offset = 1;
   }
@@ -86,15 +88,13 @@ export default class SearchScreen extends Component {
   }
 
   componentDidMount() {
-    BackHandler.addEventListener("hardwareBackPress", () => {
+    BackHandler.addEventListener('hardwareBackPress', () => {
       this.props.navigation.goBack();
       return true;
     });
   }
   loadMoreData = () => {
-    this.setState({ fetching_from_server: true }, () =>
-      this.setupImpagination()
-    );
+    this.setState({fetching_from_server: true}, () => this.setupImpagination());
   };
   renderFooter() {
     return (
@@ -102,11 +102,10 @@ export default class SearchScreen extends Component {
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={this.loadMoreData}
-          style={Styles.loadMoreBtn}
-        >
+          style={Styles.loadMoreBtn}>
           <Text style={Styles.btnText}>Load More</Text>
           {this.state.fetching_from_server ? (
-            <ActivityIndicator color="white" style={{ marginLeft: 8 }} />
+            <ActivityIndicator color="white" style={{marginLeft: 8}} />
           ) : null}
         </TouchableOpacity>
       </View>
@@ -116,7 +115,7 @@ export default class SearchScreen extends Component {
     this.offset = 1;
     this.setState({
       loading: true,
-      serverData: []
+      serverData: [],
     });
 
     this.setupImpagination();
@@ -152,52 +151,52 @@ export default class SearchScreen extends Component {
       selectedEye,
       selectedHair,
       selectedBody,
-      selectedHeight
+      selectedHeight,
     } = _this.state;
 
     let parameters = {
       ethnic_origin: selectedEthnic_origin.length
-        ? selectedEthnic_origin.join(",")
+        ? selectedEthnic_origin.join(',')
         : null,
       nationality: selectedNationality.length
-        ? selectedNationality.join(",")
+        ? selectedNationality.join(',')
         : null,
-      language: selectedLanguage.length ? selectedLanguage.join(",") : null,
+      language: selectedLanguage.length ? selectedLanguage.join(',') : null,
       second_language: selectedSecondLanguage.length
-        ? selectedSecondLanguage.join(",")
+        ? selectedSecondLanguage.join(',')
         : null,
       personality: selectedPersonality.length
-        ? selectedPersonality.join(",")
+        ? selectedPersonality.join(',')
         : null,
       personal_wealth: selectedPersonalWealth.length
-        ? selectedPersonalWealth.join(",")
+        ? selectedPersonalWealth.join(',')
         : null,
-      marital_status: selectedMarital.length ? selectedMarital.join(",") : null,
+      marital_status: selectedMarital.length ? selectedMarital.join(',') : null,
       religious_status: selectedReligious.length
-        ? selectedReligious.join(",")
+        ? selectedReligious.join(',')
         : null,
-      children: selectedChildren.length ? selectedChildren.join(",") : null,
-      siblings: selectedSiblings.length ? selectedSiblings.join(",") : null,
-      living_status: selectedLiving.length ? selectedLiving.join(",") : null,
-      move: selectedMove.length ? selectedMove.join(",") : null,
-      diet: selectedDiet.length ? selectedDiet.join(",") : null,
-      smoking: selectedSmoking.length ? selectedSmoking.join(",") : null,
-      education: selectedEducation.length ? selectedEducation.join(",") : null,
+      children: selectedChildren.length ? selectedChildren.join(',') : null,
+      siblings: selectedSiblings.length ? selectedSiblings.join(',') : null,
+      living_status: selectedLiving.length ? selectedLiving.join(',') : null,
+      move: selectedMove.length ? selectedMove.join(',') : null,
+      diet: selectedDiet.length ? selectedDiet.join(',') : null,
+      smoking: selectedSmoking.length ? selectedSmoking.join(',') : null,
+      education: selectedEducation.length ? selectedEducation.join(',') : null,
       profession: selectedProfession.length
-        ? selectedProfession.join(",")
+        ? selectedProfession.join(',')
         : null,
-      ambition: selectedAmbition.length ? selectedAmbition.join(",") : null,
-      eye_colour: selectedEye.length ? selectedEye.join(",") : null,
-      hair_colour: selectedHair.length ? selectedHair.join(",") : null,
-      body_type: selectedBody.length ? selectedBody.join(",") : null,
-      height: selectedHeight.length ? selectedHeight.join(",") : null,
+      ambition: selectedAmbition.length ? selectedAmbition.join(',') : null,
+      eye_colour: selectedEye.length ? selectedEye.join(',') : null,
+      hair_colour: selectedHair.length ? selectedHair.join(',') : null,
+      body_type: selectedBody.length ? selectedBody.join(',') : null,
+      height: selectedHeight.length ? selectedHeight.join(',') : null,
       distance,
       age_from,
       age_to,
       photos: withPhotos ? 1 : 0,
       trusted_member: trusted_member ? 1 : 0,
       permium: isPermium ? 1 : 0,
-      videos: withVideos ? 1 : 0
+      videos: withVideos ? 1 : 0,
     };
 
     for (let elements in parameters) {
@@ -212,7 +211,7 @@ export default class SearchScreen extends Component {
           this.setState({
             loading: false,
             itemslimit: false,
-            fetching_from_server: false
+            fetching_from_server: false,
           });
         } else if (data.pagination.totalItems <= 20) {
           console.log(data.pagination.totalItems);
@@ -222,91 +221,82 @@ export default class SearchScreen extends Component {
           this.setState({
             loading: false,
             fetching_from_server: false,
-            itemslimit: true
+            itemslimit: true,
           });
         } else {
           this.setState({
-            itemslimit: true
+            itemslimit: true,
           });
         }
       })
       .catch(error => {
-        ToastAndroid.show(error, ToastAndroid.LONG);
+        Toast.show(error, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        });
       });
   }
 
   render() {
-    const { moreOption } = this.state;
+    const {moreOption} = this.state;
     return (
       <React.Fragment>
-        <CommonHeader title={"Search"} />
+        <CommonHeader title={'Search'} />
         <ScrollView>
-          <Card containerStyle={{ borderRadius: 8 }}>
-            <Picker
-              selectedValue={this.state.distance}
-              onValueChange={(itemValue, itemIndex) =>
-                this.setState({ distance: itemValue })
-              }
-            >
-              <Picker.Item label="Distance from me" value="20000" />
-              {distance_range.map((item, index) => {
-                return (
-                  <Picker.Item
-                    label={item.label}
-                    value={item.value}
-                    key={index}
-                  />
-                );
-              })}
-            </Picker>
+          <Card containerStyle={{borderRadius: 8}}>
+            <Text
+              style={{
+                fontSize: 16,
+                margin: 5,
+                fontFamily: Fonts.app_font,
+                color: Colors.mainAppColor,
+              }}>
+              Distance
+            </Text>
+            <RNPickerSelect
+              placeholder={{label: '250 KM', value: '250'}}
+              style={pickerSelectStyles}
+              onValueChange={value => this.setState({distance: value})}
+              items={distance_range}
+            />
+            <Text
+              style={{
+                fontSize: 16,
+                margin: 5,
+                fontFamily: Fonts.app_font,
+                color: Colors.mainAppColor,
+              }}>
+              Age Range
+            </Text>
+
             <View style={Styles.rowpicker}>
-              <View style={Styles.picker}>
-                <Picker
-                  selectedValue={this.state.age_from}
-                  onValueChange={(itemValue, itemIndex) =>
-                    this.setState({ age_from: itemValue })
-                  }
-                >
-                  <Picker.Item label="Age From" value="18" />
-
-                  {age_range.map((item, index) => {
-                    return (
-                      <Picker.Item
-                        label={item.label}
-                        value={item.value}
-                        key={index}
-                      />
-                    );
-                  })}
-                </Picker>
-              </View>
-              <View style={Styles.picker}>
-                <Picker
-                  selectedValue={this.state.age_to}
-                  onValueChange={(itemValue, itemIndex) =>
-                    this.setState({ age_to: itemValue })
-                  }
-                >
-                  <Picker.Item label="Age To" value="99" />
-
-                  {age_range.map((item, index) => {
-                    return (
-                      <Picker.Item
-                        label={item.label}
-                        value={item.value}
-                        key={index}
-                      />
-                    );
-                  })}
-                </Picker>
-              </View>
+              <RNPickerSelect
+                style={pickerSelectStyles}
+                placeholder={{label: '18', value: '18'}}
+                onValueChange={value => this.setState({age_from: value})}
+                items={age_range}
+              />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontFamily: Fonts.app_font,
+                  color: Colors.mainAppColor,
+                }}>
+                To
+              </Text>
+              <RNPickerSelect
+                placeholder={{label: '30', value: '30'}}
+                style={pickerSelectStyles}
+                onValueChange={value => this.setState({age_to: value})}
+                items={age_range}
+              />
             </View>
             <MoreOptionItem
               name="ethnic_origin"
               title="Ethnic Origin"
               selectedItems={this.state.selectedEthnic_origin}
               onSelectionsChange={selected => {
-                this.setState({ selectedEthnic_origin: selected });
+                this.setState({selectedEthnic_origin: selected});
               }}
             />
             <MoreOptionItem
@@ -314,7 +304,7 @@ export default class SearchScreen extends Component {
               title="Nationality"
               selectedItems={this.state.selectedNationality}
               onSelectionsChange={selected => {
-                this.setState({ selectedNationality: selected });
+                this.setState({selectedNationality: selected});
               }}
             />
             <MoreOptionItem
@@ -322,34 +312,31 @@ export default class SearchScreen extends Component {
               title="Language"
               selectedItems={this.state.selectedLanguage}
               onSelectionsChange={selected => {
-                this.setState({ selectedLanguage: selected });
+                this.setState({selectedLanguage: selected});
               }}
             />
             <View
               style={{
                 flex: 1,
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                alignContent: "flex-end",
-                margin: 10
-              }}
-            >
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                alignContent: 'flex-end',
+                margin: 10,
+              }}>
               <Text
                 style={{
                   fontFamily: Fonts.app_font,
-
-                  fontSize: 16
+                  fontSize: 16,
                 }}
-                onPress={() => this.setState({ moreOption: !moreOption })}
-              >
+                onPress={() => this.setState({moreOption: !moreOption})}>
                 More Option
               </Text>
               <Icon
-                onPress={() => this.setState({ moreOption: !moreOption })}
+                onPress={() => this.setState({moreOption: !moreOption})}
                 name="arrow-down"
                 type="simple-line-icon"
                 size={12}
-                iconStyle={{ margin: 5 }}
+                iconStyle={{margin: 5}}
               />
             </View>
 
@@ -360,7 +347,7 @@ export default class SearchScreen extends Component {
                   title="Second Language"
                   selectedItems={this.state.selectedSecondLanguage}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedSecondLanguage: selected });
+                    this.setState({selectedSecondLanguage: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -368,7 +355,7 @@ export default class SearchScreen extends Component {
                   title="Personality Style"
                   selectedItems={this.state.selectedPersonality}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedPersonality: selected });
+                    this.setState({selectedPersonality: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -376,7 +363,7 @@ export default class SearchScreen extends Component {
                   title="Personal Wealth"
                   selectedItems={this.state.selectedPersonalWealth}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedPersonalWealth: selected });
+                    this.setState({selectedPersonalWealth: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -384,7 +371,7 @@ export default class SearchScreen extends Component {
                   title="Marital Status"
                   selectedItems={this.state.selectedMarital}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedMarital: selected });
+                    this.setState({selectedMarital: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -392,7 +379,7 @@ export default class SearchScreen extends Component {
                   title="Religious Affiliation"
                   selectedItems={this.state.selectedReligious}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedReligious: selected });
+                    this.setState({selectedReligious: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -400,7 +387,7 @@ export default class SearchScreen extends Component {
                   title="Children"
                   selectedItems={this.state.selectedChildren}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedChildren: selected });
+                    this.setState({selectedChildren: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -408,7 +395,7 @@ export default class SearchScreen extends Component {
                   title="Siblings"
                   selectedItems={this.state.selectedSiblings}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedSiblings: selected });
+                    this.setState({selectedSiblings: selected});
                   }}
                 />
 
@@ -417,7 +404,7 @@ export default class SearchScreen extends Component {
                   title="Living Status"
                   selectedItems={this.state.selectedLiving}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedLiving: selected });
+                    this.setState({selectedLiving: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -425,7 +412,7 @@ export default class SearchScreen extends Component {
                   title="Willing to Move"
                   selectedItems={this.state.selectedMove}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedMove: selected });
+                    this.setState({selectedMove: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -433,7 +420,7 @@ export default class SearchScreen extends Component {
                   title="Diet"
                   selectedItems={this.state.selectedDiet}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedDiet: selected });
+                    this.setState({selectedDiet: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -441,7 +428,7 @@ export default class SearchScreen extends Component {
                   title="Smoking"
                   selectedItems={this.state.selectedSmoking}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedSmoking: selected });
+                    this.setState({selectedSmoking: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -449,7 +436,7 @@ export default class SearchScreen extends Component {
                   title="Education"
                   selectedItems={this.state.selectedEducation}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedEducation: selected });
+                    this.setState({selectedEducation: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -457,7 +444,7 @@ export default class SearchScreen extends Component {
                   title="Profession"
                   selectedItems={this.state.selectedProfession}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedProfession: selected });
+                    this.setState({selectedProfession: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -465,7 +452,7 @@ export default class SearchScreen extends Component {
                   title="Ambition"
                   selectedItems={this.state.selectedAmbition}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedAmbition: selected });
+                    this.setState({selectedAmbition: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -473,7 +460,7 @@ export default class SearchScreen extends Component {
                   title="Eye Colour"
                   selectedItems={this.state.selectedEye}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedEye: selected });
+                    this.setState({selectedEye: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -481,7 +468,7 @@ export default class SearchScreen extends Component {
                   title="Hair Colour"
                   selectedItems={this.state.selectedHair}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedHair: selected });
+                    this.setState({selectedHair: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -489,7 +476,7 @@ export default class SearchScreen extends Component {
                   title="Body Type"
                   selectedItems={this.state.selectedBody}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedBody: selected });
+                    this.setState({selectedBody: selected});
                   }}
                 />
                 <MoreOptionItem
@@ -497,7 +484,7 @@ export default class SearchScreen extends Component {
                   title="Height"
                   selectedItems={this.state.selectedHeight}
                   onSelectionsChange={selected => {
-                    this.setState({ selectedHeight: selected });
+                    this.setState({selectedHeight: selected});
                   }}
                 />
               </View>
@@ -510,7 +497,7 @@ export default class SearchScreen extends Component {
                 checked={this.state.trusted_member}
                 onPress={() =>
                   this.setState({
-                    trusted_member: !this.state.trusted_member
+                    trusted_member: !this.state.trusted_member,
                   })
                 }
               />
@@ -521,7 +508,7 @@ export default class SearchScreen extends Component {
                 checked={this.state.withPhotos}
                 onPress={() =>
                   this.setState({
-                    withPhotos: !this.state.withPhotos
+                    withPhotos: !this.state.withPhotos,
                   })
                 }
               />
@@ -534,7 +521,7 @@ export default class SearchScreen extends Component {
                 checked={this.state.isPermium}
                 onPress={() =>
                   this.setState({
-                    isPermium: !this.state.isPermium
+                    isPermium: !this.state.isPermium,
                   })
                 }
               />
@@ -545,42 +532,38 @@ export default class SearchScreen extends Component {
                 checked={this.state.withVideos}
                 onPress={() =>
                   this.setState({
-                    withVideos: !this.state.withVideos
+                    withVideos: !this.state.withVideos,
                   })
                 }
               />
             </View>
             <TouchableOpacity
               style={Styles.searchButton}
-              onPress={() => this.filterImpagination()}
-            >
+              onPress={() => this.filterImpagination()}>
               <LinearGradient
-                colors={["#FC3838", "#F52B43", "#ED0D51"]}
-                start={{ x: 0.7, y: 1.2 }}
-                end={{ x: 0.0, y: 0.7 }}
+                colors={['#FC3838', '#F52B43', '#ED0D51']}
+                start={{x: 0.7, y: 1.2}}
+                end={{x: 0.0, y: 0.7}}
                 style={{
                   height: 48,
                   width: 270,
-                  alignItems: "center",
-                  justifyContent: "center",
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   width: 270,
-                  borderRadius: 3
-                }}
-              >
-                <Text style={{ color: "white", fontWeight: "bold" }}>
-                  Filter
-                </Text>
+                  borderRadius: 3,
+                }}>
+                <Text style={{color: 'white', fontWeight: 'bold'}}>Filter</Text>
               </LinearGradient>
             </TouchableOpacity>
           </Card>
           {this.state.loading && <SampleUserCard />}
           {!this.state.loading && (
             <FlatList
-              style={{ flex: 0 }}
+              style={{flex: 0}}
               removeClippedSubviews={true}
               keyExtractor={(item, index) => item.user_id}
               data={this.state.serverData}
-              renderItem={({ item, index }) => (
+              renderItem={({item, index}) => (
                 <UserCard key={index} user={item} />
               )}
               ListFooterComponent={
@@ -593,3 +576,25 @@ export default class SearchScreen extends Component {
     );
   }
 }
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: 'purple',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+});

@@ -23,19 +23,22 @@ export default StyleSheet.create({
     resizeMode: "contain"
   },
   textInput: {
+    borderWidth:1,
+    borderRadius:3,
+    borderColor:Colors.secondaryColor,
     alignSelf: "stretch",
-    height: 40,
+    height: 45,
     fontFamily: Fonts.LatoRegular,
-
     marginBottom: 25,
     color: "#757575"
   },
   textInputOfUserName: {
     alignSelf: "stretch",
     height: 40,
+
     fontFamily: Fonts.LatoRegular,
 
-    marginBottom: 1,
+    marginLeft: 5,
     color: "#757575"
   },
   lottie: {

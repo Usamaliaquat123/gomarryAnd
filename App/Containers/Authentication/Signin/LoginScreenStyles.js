@@ -43,8 +43,11 @@ export default StyleSheet.create({
     alignItems: "center"
   },
   textInput: {
+    borderWidth:1,
+    borderRadius:3,
+    borderColor:Colors.secondaryColor,
     alignSelf: "stretch",
-    height: 40,
+    height: 45,
     fontFamily: Fonts.app_font,
     fontSize:16,
     fontWeight: "400",

@@ -319,17 +319,16 @@ export default class ProfileSectionForm extends Component {
                 for (var sv in option) {
                   if (!option.hasOwnProperty(sv)) continue;
                   var suboption = option[sv];
-                  options.push(
-                    <IdentifiedPicker.Item
-                      key={sv}
-                      label={suboption}
-                      value={sv}
-                    />
-                  );
+                  options.push({
+                      key:sv,
+                      label:suboption,
+                      value:sv
+                  }
+                  )
                 }
               } else {
                 options.push(
-                  <IdentifiedPicker.Item key={v} label={option} value={v} />
+                  {key:v, label:option, value:v } 
                 );
               }
             }
@@ -339,24 +338,22 @@ export default class ProfileSectionForm extends Component {
                 <Text style={styles.textTitle}>{attribute.title}</Text>
                 <View
                   style={{
-                    borderWidth: 1,
-                    borderColor: Colors.mainAppColor,
-                    borderRadius: 5
+                    margin:5,
                   }}
                 >
                   <IdentifiedPicker
-                    itemStyle={{ color: Colors.mainAppColor }}
+                    // itemStyle={{ color: Colors.mainAppColor }}
                     id={attribute.key}
-                    selectedValue={
+                    value={
                       global.user.data.profile[this.state.section][
                         "_" + attribute.key
                       ]
                     }
                     onValueChange={this.handleOnValueChange}
-                  >
-                    <IdentifiedPicker.Item label="-----" value="" />
-                    {options}
-                  </IdentifiedPicker>
+                    items={options}
+                  />
+                    {/* <IdentifiedPicker.Item label="-----" value="" /> */}
+                  
                 </View>
               </View>
             );
@@ -410,7 +407,7 @@ export default class ProfileSectionForm extends Component {
         {load}
         <CommonHeaderBack title={this.state.section} />
 
-        <ScrollView style={{ margin: 10 }}>{form}</ScrollView>
+        <ScrollView >{form}</ScrollView>
 
         {this.state.section != "location" && this.state.loading == false && (
           <ButtonGroup

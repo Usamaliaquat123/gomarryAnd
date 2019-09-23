@@ -1,40 +1,49 @@
-import React, { Component } from "react";
+import React, {Component} from 'react';
 import {
   Text,
   TouchableOpacity,
   View,
   ScrollView,
   Image,
-  RefreshControl
-} from "react-native";
-import { Icon } from "react-native-elements";
-import Dataset from "impagination";
-import DeviceInfo from "react-native-device-info";
-import Modal from "react-native-modalbox";
-import LinearGradient from "react-native-linear-gradient";
-import firebase from "react-native-firebase";
+  RefreshControl,
+} from 'react-native';
+import {Icon} from 'react-native-elements';
+import Dataset from 'impagination';
+import DeviceInfo from 'react-native-device-info';
+import Modal from 'react-native-modalbox';
+import LinearGradient from 'react-native-linear-gradient';
+import firebase from 'react-native-firebase';
+import {connect} from 'react-redux';
+
 import {
   Notification,
   NotificationOpen,
-  RemoteMessage
-} from "react-native-firebase";
-import Api from "../../../Services/Api";
-import CommonHeader from "../../../Components/CommonHeader";
-import DashboardCardView from "../../../Components/DashboardCardView";
-import SampleDashBoardCard from "../../../Components/SampleDashBoardCard";
+  RemoteMessage,
+} from 'react-native-firebase';
+import {
+  addMessages,
+  setNewMessage,
+  addTypingUser,
+  removeTypingUser,
+} from '../../actions';
+
+import Api from '../../../Services/Api';
+import CommonHeader from '../../../Components/CommonHeader';
+import DashboardCardView from '../../../Components/DashboardCardView';
+import SampleDashBoardCard from '../../../Components/SampleDashBoardCard';
 // Styles
-import styles from "./DashboardScreenStyle";
-import { Fonts } from "../../../Themes";
-export default class DashboardScreen extends Component {
+import styles from './DashboardScreenStyle';
+import {Fonts} from '../../../Themes';
+class DashboardScreen extends Component {
   static navigationOptions = {
-    title: "Dashboard",
-    drawerIcon: ({ tintColor }) => (
+    title: 'Dashboard',
+    drawerIcon: ({tintColor}) => (
       <Icon
         name="md-home"
         type="ionicon"
-        style={[styles.icon, { color: tintColor }]}
+        style={[styles.icon, {color: tintColor}]}
       />
-    )
+    ),
   };
   constructor(props) {
     super(props);
@@ -48,30 +57,30 @@ export default class DashboardScreen extends Component {
       viewedmeFlag: false,
       FavouriteFlag: false,
       FavouriteMeFlag: false,
-      userProfilePictureShower: "",
-      username: "",
-      tagline: "",
-      notificationMessageOverview: "",
-      notificationMessage: "",
+      userProfilePictureShower: '',
+      username: '',
+      tagline: '',
+      notificationMessageOverview: '',
+      notificationMessage: '',
       // Top bar loading state
-      messageOverview: "",
-      message: "",
-      messageFriendId: "",
-      messageUserName: "",
-      currentComponent: "dashboard"
+      messageOverview: '',
+      message: '',
+      messageFriendId: '',
+      messageUserName: '',
+      currentComponent: 'dashboard',
     };
   }
 
   _onRefresh = () => {
-    this.setState({ refreshing: true });
+    this.setState({refreshing: true});
     this.componentWillMount(this);
-    this.setState({ refreshing: false });
+    this.setState({refreshing: false});
     // this.props.rerender()
   };
   componentWillMount() {
     const SUMMARY_ID = 1;
 
-    let GROUP = "io.invertase.firebase.messaging.RNFirebaseInstanceIdService";
+    let GROUP = 'io.invertase.firebase.messaging.RNFirebaseInstanceIdService';
 
     // const notification = new firebase.notifications.Notification().android
     //   .setChannelId(1)
@@ -89,50 +98,50 @@ export default class DashboardScreen extends Component {
       .notifications()
       .getInitialNotification()
       .then((notificationOpen: NotificationOpen) => {
-        console.log("notificationOpen");
+        console.log('notificationOpen');
         console.log(notificationOpen);
         firebase.notifications().removeAllDeliveredNotifications();
         if (notificationOpen) {
-          console.log("notificationOpen");
+          console.log('notificationOpen');
           const notification: Notification = notificationOpen.notification;
           console.log(notification);
           if (
-            notification._data.type == "favourited" ||
-            notification._data.type == "profile_invite" ||
-            notification._data.type == "photo_request_approved"
+            notification._data.type == 'favourited' ||
+            notification._data.type == 'profile_invite' ||
+            notification._data.type == 'photo_request_approved'
           ) {
-            this.props.navigation.navigate("UserProfile", {
+            this.props.navigation.navigate('UserProfile', {
               user_name: notification._data.username,
-              userId: notification._data.triggered_by
+              userId: notification._data.triggered_by,
             });
-          } else if (notification._data.type == "message") {
-            this.props.navigation.navigate("SentMail", {
-              friendId: notification._data.user_id,
-              userName: notification._data.username
+          } else if (notification._data.type == 'message') {
+            this.props.navigation.navigate('SentMail', {
+              friend_id: notification._data.user_id,
+              userName: notification._data.username,
             });
-          } else if (notification._data.type == "photo_request") {
-            this.props.navigation.navigate("RequestsScreen", {
-              section: "pending"
+          } else if (notification._data.type == 'photo_request') {
+            this.props.navigation.navigate('RequestsScreen', {
+              section: 'pending',
             });
           } else if (
-            notification._data.type == "photo_approved" ||
-            notification._data.type == "video_approved" ||
-            notification._data.type == "trusted" ||
-            notification._data.type == "not_trusted"
+            notification._data.type == 'photo_approved' ||
+            notification._data.type == 'video_approved' ||
+            notification._data.type == 'trusted' ||
+            notification._data.type == 'not_trusted'
           ) {
-            this.props.navigation.navigate("MyProfileScreen");
+            this.props.navigation.navigate('MyProfileScreen');
           } else if (
-            notification._data.type == "subscription_created" ||
-            notification._data.type == "subscription_failed" ||
-            notification._data.type == "subscription_renewed" ||
-            notification._data.type == "subscription_renew_failed" ||
-            notification._data.type == "subscription_event" ||
-            notification._data.type == "subscription_payment" ||
-            notification._data.type == "subscription_payment_pending" ||
-            notification._data.type == "subscription_cancelled" ||
-            notification._data.type == "strike"
+            notification._data.type == 'subscription_created' ||
+            notification._data.type == 'subscription_failed' ||
+            notification._data.type == 'subscription_renewed' ||
+            notification._data.type == 'subscription_renew_failed' ||
+            notification._data.type == 'subscription_event' ||
+            notification._data.type == 'subscription_payment' ||
+            notification._data.type == 'subscription_payment_pending' ||
+            notification._data.type == 'subscription_cancelled' ||
+            notification._data.type == 'strike'
           ) {
-            this.props.navigation.navigate("Notifications");
+            this.props.navigation.navigate('Notifications');
           }
         }
       });
@@ -175,9 +184,7 @@ export default class DashboardScreen extends Component {
   //
   // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  componentWillUnmount() {
-    this.notificationListener();
-  }
+  componentWillUnmount() {}
   // complete setup firebase
   setupFMessaging = async () => {
     await this.firebaseCheckPermission().then(IsUserPer => {
@@ -187,71 +194,90 @@ export default class DashboardScreen extends Component {
             this.messageListener = firebase
               .messaging()
               .onMessage((message: RemoteMessage) => {
-                if (message._data.type == "is_typing") {
+                if (message._data.type == 'is_typing') {
                   if (global.Inbox && global.messageScreen == undefined) {
-                    this.props.navigation.navigate("Inbox", {
-                      message: message
-                    });
                   } else if (global.messageScreen == message._data.friend_id) {
-                    this.props.navigation.navigate("SentMail", {
-                      message: message
-                    });
                   }
                 }
               });
             this.notificationListener = firebase
               .notifications()
               .onNotification((notification: Notification) => {
-                console.log("notification");
+                console.log('notification');
                 console.log(notification);
 
                 if (
-                  notification._data.type == "favourited" ||
-                  notification._data.type == "profile_invite" ||
-                  notification._data.type == "photo_request_approved"
+                  notification._data.type == 'favourited' ||
+                  notification._data.type == 'profile_invite' ||
+                  notification._data.type == 'photo_request_approved'
                 ) {
                   const regex = /(<([^>]+)>)/gi;
-                  const result = notification._data.text.replace(regex, "");
+                  const result = notification._data.text.replace(regex, '');
                   this.setState({
-                    localNotifyIconType: "entypo",
-                    localNotifyIconName: "heart-outlined",
+                    localNotifyIconType: 'entypo',
+                    localNotifyIconName: 'heart-outlined',
                     notifySenderImg: notification._data.default_picture,
-                    notifySenderDesc: result
+                    notifySenderDesc: result,
                   });
                   this.refs.featuresNotify.open();
-                } else if (notification._data.type == "is_typing") {
-                  if (global.Inbox && global.messageScreen == undefined) {
-                    this.props.navigation.navigate("Inbox", {
-                      message: notification
-                    });
-                  } else if (
-                    global.messageScreen == notification._data.friend_id
-                  ) {
-                    this.props.navigation.navigate("SentMail", {
-                      message: notification
-                    });
-                  }
-                } else if (notification._data.type == "message") {
+                } else if (notification._data.type == 'is_typing') {
+                  this.props.addTypingUser(notification._data.friend_id);
+                  setTimeout(() => {
+                    this.props.removeTypingUser(notification._data.friend_id);
+                  }, 3000);
+                } else if (notification._data.type == 'message') {
                   if (global.messageScreen == notification._data.user_id) {
-                    this.props.navigation.navigate("SentMail", {
-                      message: notification
+                    this.props.addMessages(notification._data.user_id, {
+                      message: {
+                        id: notification._data.message_id,
+                        boby: notification._data.body,
+                        rawTime: notification._data.time,
+                      },
+                      sender: {
+                        user_id: notification._data.user_id,
+                        username: notification._data.username,
+                        // avatar: this.state.userDefaultPicture
+                      },
                     });
-                  } else if (
-                    global.Inbox &&
-                    global.messageScreen == undefined
-                  ) {
-                    this.props.navigation.navigate("Inbox", {
-                      message: notification
-                    });
-                  } else if (global.messageScreen == undefined) {
-                    this.setState({
-                      messageOverview: `${notification._data.username} messaged`,
-                      message: notification._data.body,
-                      messageUserName: notification._data.username,
-                      messageFriendId: notification._data.user_id
-                    });
-                    this.refs.messageInbox.open();
+                    // this.props.navigation.navigate("SentMail", {
+                    //   message: notification
+                    // });
+                  } else {
+                    this.props.setNewMessage(
+                      notification._data.body,
+                      notification._data.user_id,
+                      notification._data.time,
+                      notification._data.default_picture,
+                      notification._data.username,
+
+                      notification._data.unreadCount,
+
+                      // lastMessageBody,
+                      // friend_id,
+                      // lastMessageTimeRaw,
+                      // default_picture,
+                      // username,
+                      // star,
+                      // archived,
+                      // unreadCount,
+                    );
                   }
+                  // else if (
+                  //   global.Inbox &&
+                  //   global.messageScreen == undefined
+                  // ) {
+                  //   this.props.navigation.navigate("Inbox", {
+                  //     message: notification
+                  //   });
+                  // } else if (global.messageScreen == undefined) {
+                  //   this.setState({
+                  //     messageOverview: `${notification._data.username} messaged`,
+                  //     message: notification._data.body,
+                  //     messageUserName: notification._data.username,
+                  //     messageFriendId: notification._data.user_id
+                  //   });
+                  //   this.refs.messageInbox.open();
+                  // }
                 }
               });
             Api.registerDeviceToken(deviceId, deviceToken)
@@ -272,7 +298,7 @@ export default class DashboardScreen extends Component {
           })
           .catch(() => {
             this.setState({
-              errMsg: "Your device is not supported to notifications"
+              errMsg: 'Your device is not supported to notifications',
             });
             this.refs.errAlert.open();
           });
@@ -290,7 +316,7 @@ export default class DashboardScreen extends Component {
           if (fcmToken) {
             resolve(fcmToken);
           } else {
-            reject("Your device is not supported to notifications");
+            reject('Your device is not supported to notifications');
           }
         });
     });
@@ -319,7 +345,7 @@ export default class DashboardScreen extends Component {
           .requestPermission()
           .then(resolve(true));
       } catch (error) {
-        reject("Your device is not supported to notifications");
+        reject('Your device is not supported to notifications');
       }
     });
   };
@@ -404,9 +430,9 @@ export default class DashboardScreen extends Component {
   // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   gotoUserProfile = user => {
-    this.props.navigation.navigate("UserProfile", {
+    this.props.navigation.navigate('UserProfile', {
       user_name: user.meta.username,
-      userId: user.user_id
+      userId: user.user_id,
     });
   };
   // Setup Impagination of Recent Users
@@ -418,24 +444,24 @@ export default class DashboardScreen extends Component {
       loadHorizon: 2,
 
       observe(datasetState) {
-        _this.setState({ datasetState });
+        _this.setState({datasetState});
       },
 
       // Where to fetch the data from.
       fetch(pageOffset, pageSize, stats) {
-        return Api.search("", pageOffset + 1, pageSize)
+        return Api.search('', pageOffset + 1, pageSize)
           .then(data => data.users)
           .catch(error => {
             _this.refs.errAlert.open();
             _this.setState({
               errMsg:
-                "Looks like you are offline now. Please connect your connection and try again"
+                'Looks like you are offline now. Please connect your connection and try again',
             });
           });
-      }
+      },
     });
     dataset.setReadOffset(0);
-    this.setState({ dataset });
+    this.setState({dataset});
   }
   // Setup Impagination of Interest favourite Users
   setupImpaginationOfInterestViewedMe() {
@@ -445,16 +471,16 @@ export default class DashboardScreen extends Component {
       loadHorizon: 15,
 
       observe(datasetStateOfInterestViewedMe) {
-        _this.setState({ datasetStateOfInterestViewedMe });
+        _this.setState({datasetStateOfInterestViewedMe});
       },
 
       // Where to fetch the data from.
       fetch(pageOffset, pageSize, stats) {
-        return Api.interests("viewedme", pageOffset + 1, pageSize)
+        return Api.interests('viewedme', pageOffset + 1, pageSize)
           .then(data => {
             if (data.users.length != 0) return data.users;
             else {
-              _this.setState({ viewedmeFlag: true });
+              _this.setState({viewedmeFlag: true});
               return;
             }
           })
@@ -462,13 +488,13 @@ export default class DashboardScreen extends Component {
             _this.refs.errAlert.open();
             _this.setState({
               errMsg:
-                "Looks like you are offline now. Please connect your connection and try again"
+                'Looks like you are offline now. Please connect your connection and try again',
             });
           });
-      }
+      },
     });
     dataset.setReadOffset(0);
-    this.setState({ dataset });
+    this.setState({dataset});
   }
 
   // Setup Impagination of Interest favourite Users
@@ -478,15 +504,15 @@ export default class DashboardScreen extends Component {
       pageSize: 15,
       loadHorizon: 15,
       observe(datasetStateOfInterestFavourite) {
-        _this.setState({ datasetStateOfInterestFavourite });
+        _this.setState({datasetStateOfInterestFavourite});
       },
       // Where to fetch the data from.
       fetch(pageOffset, pageSize, stats) {
-        return Api.interests("favourited", pageOffset + 1, pageSize)
+        return Api.interests('favourited', pageOffset + 1, pageSize)
           .then(data => {
             if (data.users.length != 0) return data.users;
             else {
-              _this.setState({ FavouriteFlag: true });
+              _this.setState({FavouriteFlag: true});
               return;
             }
           })
@@ -494,13 +520,13 @@ export default class DashboardScreen extends Component {
             _this.refs.errAlert.open();
             _this.setState({
               errMsg:
-                "Looks like you are offline now. Please connect your connection and try again"
+                'Looks like you are offline now. Please connect your connection and try again',
             });
           });
-      }
+      },
     });
     dataset.setReadOffset(0);
-    this.setState({ dataset });
+    this.setState({dataset});
   }
   // Setup Impagination of favourited Me Users
   setupImpaginationOfInterestFavouritedMe() {
@@ -509,15 +535,15 @@ export default class DashboardScreen extends Component {
       pageSize: 15,
       loadHorizon: 15,
       observe(datasetStateOfInterestFavouritedMe) {
-        _this.setState({ datasetStateOfInterestFavouritedMe });
+        _this.setState({datasetStateOfInterestFavouritedMe});
       },
       // Where to fetch the data from.
       fetch(pageOffset, pageSize, stats) {
-        return Api.interests("favouritedme", pageOffset + 1, pageSize)
+        return Api.interests('favouritedme', pageOffset + 1, pageSize)
           .then(data => {
             if (data.users.length != 0) return data.users;
             else {
-              _this.setState({ FavouriteMeFlag: true });
+              _this.setState({FavouriteMeFlag: true});
               return;
             }
           })
@@ -525,13 +551,13 @@ export default class DashboardScreen extends Component {
             _this.refs.errAlert.open();
             _this.setState({
               errMsg:
-                "Looks like you are offline now. Please connect your connection and try again"
+                'Looks like you are offline now. Please connect your connection and try again',
             });
           });
-      }
+      },
     });
     dataset.setReadOffset(0);
-    this.setState({ dataset });
+    this.setState({dataset});
   }
 
   // =================================================================================================================================
@@ -605,7 +631,7 @@ export default class DashboardScreen extends Component {
     const that = this;
     return this.state.datasetStateOfInterestFavourite.map(function(
       user,
-      index
+      index,
     ) {
       if (
         !user ||
@@ -692,7 +718,7 @@ export default class DashboardScreen extends Component {
     const that = this;
     return this.state.datasetStateOfInterestFavouritedMe.map(function(
       user,
-      index
+      index,
     ) {
       if (
         !user ||
@@ -737,43 +763,39 @@ export default class DashboardScreen extends Component {
       <React.Fragment>
         <CommonHeader title="GoMarry" />
         <ScrollView
-          style={[styles.mainContainerHome, { backgroundColor: "#F0F8FF" }]}
+          style={[styles.mainContainerHome, {backgroundColor: '#F0F8FF'}]}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={this.state.refreshing}
               onRefresh={this._onRefresh}
             />
-          }
-        >
+          }>
           <View
             style={[
               styles.row,
               {
                 marginTop: 10,
-                marginLeft: 5
-              }
-            ]}
-          >
+                marginLeft: 5,
+              },
+            ]}>
             <Text style={styles.maintitle}>Recent Users</Text>
             <TouchableOpacity
               onPress={() =>
                 // this.props.navigation.navigate("AllRecentUsersScreen")
-                this.props.navigation.navigate("ViewAll", {
-                  title: "Recent Users",
-                  filter: "recent"
+                this.props.navigation.navigate('ViewAll', {
+                  title: 'Recent Users',
+                  filter: 'recent',
                 })
               }
-              style={{ backgroundColor: "#F0F8FF" }}
-            >
+              style={{backgroundColor: '#F0F8FF'}}>
               <Text style={styles.viewall}>View all >></Text>
             </TouchableOpacity>
           </View>
           <ScrollView
             showsHorizontalScrollIndicator={false}
             horizontal={true}
-            style={{ backgroundColor: "#F0F8FF" }}
-          >
+            style={{backgroundColor: '#F0F8FF'}}>
             {this.renderRecentUsers()}
           </ScrollView>
           {!this.state.FavouriteFlag && (
@@ -783,20 +805,18 @@ export default class DashboardScreen extends Component {
                   styles.row,
                   {
                     marginTop: 1,
-                    marginLeft: 5
-                  }
-                ]}
-              >
+                    marginLeft: 5,
+                  },
+                ]}>
                 <Text style={styles.maintitle}>Favourited Users</Text>
                 <TouchableOpacity
                   onPress={() =>
-                    this.props.navigation.navigate("ViewAll", {
-                      section: "favourited",
-                      title: "Favourite Users"
+                    this.props.navigation.navigate('ViewAll', {
+                      section: 'favourited',
+                      title: 'Favourite Users',
                     })
                   }
-                  style={{ backgroundColor: "#F0F8FF" }}
-                >
+                  style={{backgroundColor: '#F0F8FF'}}>
                   <Text style={styles.viewall}>View all >></Text>
                 </TouchableOpacity>
               </View>
@@ -804,8 +824,7 @@ export default class DashboardScreen extends Component {
               <ScrollView
                 showsHorizontalScrollIndicator={false}
                 horizontal={true}
-                style={{ backgroundColor: "#F0F8FF" }}
-              >
+                style={{backgroundColor: '#F0F8FF'}}>
                 {this.renderFavouritesUsers()}
               </ScrollView>
             </React.Fragment>
@@ -817,20 +836,18 @@ export default class DashboardScreen extends Component {
                 <Text style={styles.maintitle}>Viewed me</Text>
                 <TouchableOpacity
                   onPress={() =>
-                    this.props.navigation.navigate("ViewAll", {
-                      section: "viewedme",
-                      title: "Viewed Me"
+                    this.props.navigation.navigate('ViewAll', {
+                      section: 'viewedme',
+                      title: 'Viewed Me',
                     })
-                  }
-                >
+                  }>
                   <Text style={styles.viewall}>View all >></Text>
                 </TouchableOpacity>
               </View>
               <ScrollView
                 showsHorizontalScrollIndicator={false}
                 horizontal={true}
-                style={{ backgroundColor: "#F0F8FF" }}
-              >
+                style={{backgroundColor: '#F0F8FF'}}>
                 {this.renderViewedMeUsers()}
               </ScrollView>
             </React.Fragment>
@@ -841,20 +858,18 @@ export default class DashboardScreen extends Component {
                 <Text style={styles.maintitle}>Favourited me</Text>
                 <TouchableOpacity
                   onPress={() =>
-                    this.props.navigation.navigate("ViewAll", {
-                      section: "favouritedme",
-                      title: "Favourited Me"
+                    this.props.navigation.navigate('ViewAll', {
+                      section: 'favouritedme',
+                      title: 'Favourited Me',
                     })
-                  }
-                >
+                  }>
                   <Text style={styles.viewall}>View all >></Text>
                 </TouchableOpacity>
               </View>
 
               <ScrollView
                 showsHorizontalScrollIndicator={false}
-                horizontal={true}
-              >
+                horizontal={true}>
                 {this.renderFavouritedMe()}
               </ScrollView>
             </React.Fragment>
@@ -863,43 +878,38 @@ export default class DashboardScreen extends Component {
           {/* ERROR POPUP */}
           <Modal
             style={[styles.errAlert, styles.errAlert3]}
-            position={"center"}
-            ref={"errAlert"}
+            position={'center'}
+            ref={'errAlert'}
             backdrop={true}
             coverScreen={true}
-            backdropPressToClose={false}
-          >
+            backdropPressToClose={false}>
             <View>
               <View
                 style={{
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
                 <Icon
                   type="antdesign"
                   name="closecircle"
                   size={50}
-                  color={"#FC3838"}
+                  color={'#FC3838'}
                 />
               </View>
-              <View
-                style={{ paddingLeft: 20, paddingRight: 10, paddingTop: 15 }}
-              >
-                <Text style={{ textAlign: "center", fontSize: 14 }}>
+              <View style={{paddingLeft: 20, paddingRight: 10, paddingTop: 15}}>
+                <Text style={{textAlign: 'center', fontSize: 14}}>
                   {this.state.errMsg}
                 </Text>
               </View>
-              <View style={{ marginTop: 10 }}>
+              <View style={{marginTop: 10}}>
                 <Text
                   onPress={() => this.refs.errAlert.close()}
                   style={{
                     fontFamily: Fonts.app_font,
-                    color: "#FC3838",
-                    fontWeight: "bold",
-                    textAlign: "center"
-                  }}
-                >
+                    color: '#FC3838',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  }}>
                   Review Credientials !
                 </Text>
               </View>
@@ -908,67 +918,60 @@ export default class DashboardScreen extends Component {
 
           <Modal
             style={[styles.errAlert, styles.errAlert3]}
-            position={"center"}
+            position={'center'}
             x
-            ref={"messageInbox"}
+            ref={'messageInbox'}
             backdrop={true}
             coverScreen={true}
-            backdropPressToClose={true}
-          >
+            backdropPressToClose={true}>
             <View>
               <View
                 style={{
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
                 <Icon
                   type="antdesign"
                   name="message1"
                   size={50}
-                  color={"#FC3838"}
+                  color={'#FC3838'}
                 />
               </View>
-              <View
-                style={{ paddingLeft: 20, paddingRight: 10, paddingTop: 15 }}
-              >
+              <View style={{paddingLeft: 20, paddingRight: 10, paddingTop: 15}}>
                 <Text
                   style={{
-                    textAlign: "center",
+                    textAlign: 'center',
                     fontSize: 14,
-                    fontWeight: "bold"
-                  }}
-                >
+                    fontWeight: 'bold',
+                  }}>
                   {this.state.messageOverview}
                 </Text>
-                <Text style={{ textAlign: "center", fontSize: 14 }}>
+                <Text style={{textAlign: 'center', fontSize: 14}}>
                   {this.state.message}
                 </Text>
               </View>
-              <View style={{ marginTop: 10 }}>
+              <View style={{marginTop: 10}}>
                 <TouchableOpacity
                   style={styles.loginButton}
                   onPress={() => {
                     this.refs.messageInbox.close();
-                    this.props.navigation.navigate("SentMail", {
+                    this.props.navigation.navigate('SentMail', {
                       friendId: this.state.messageFriendId,
-                      userName: this.state.messageUserName
+                      userName: this.state.messageUserName,
                     });
-                  }}
-                >
+                  }}>
                   <LinearGradient
-                    colors={["#FC3838", "#F52B43", "#ED0D51"]}
-                    start={{ x: 0.7, y: 1.2 }}
-                    end={{ x: 0.0, y: 0.7 }}
+                    colors={['#FC3838', '#F52B43', '#ED0D51']}
+                    start={{x: 0.7, y: 1.2}}
+                    end={{x: 0.0, y: 0.7}}
                     style={{
                       height: 48,
                       width: 240,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 50
-                    }}
-                  >
-                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 50,
+                    }}>
+                    <Text style={{color: 'white', fontWeight: 'bold'}}>
                       Check Your inbox now...
                     </Text>
                   </LinearGradient>
@@ -979,76 +982,70 @@ export default class DashboardScreen extends Component {
 
           <Modal
             style={{
-              borderColor: "#FC3838",
-              shadowColor: "rgb(252, 56, 56)",
+              borderColor: '#FC3838',
+              shadowColor: 'rgb(252, 56, 56)',
               marginTop: 10,
               height: 180,
               width: 300,
-              backgroundColor: "white",
+              backgroundColor: 'white',
               borderRadius: 10,
-              justifyContent: "center",
-              alignItems: "center"
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
-            position={"center"}
+            position={'center'}
             x
-            ref={"notificationPopup"}
+            ref={'notificationPopup'}
             backdrop={true}
             coverScreen={true}
-            backdropPressToClose={true}
-          >
+            backdropPressToClose={true}>
             <View>
               <View
                 style={{
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
                 <Icon
                   type="material"
                   name="notifications-active"
                   size={50}
-                  color={"#FC3838"}
+                  color={'#FC3838'}
                 />
               </View>
-              <View
-                style={{ paddingLeft: 20, paddingRight: 10, paddingTop: 15 }}
-              >
+              <View style={{paddingLeft: 20, paddingRight: 10, paddingTop: 15}}>
                 <Text
                   style={{
-                    textAlign: "center",
+                    textAlign: 'center',
                     fontSize: 14,
-                    fontWeight: "bold"
-                  }}
-                >
+                    fontWeight: 'bold',
+                  }}>
                   {this.state.notificationMessageOverview}
                 </Text>
-                <Text style={{ textAlign: "center", fontSize: 14 }}>
+                <Text style={{textAlign: 'center', fontSize: 14}}>
                   {this.state.notificationMessage}
                 </Text>
               </View>
-              <View style={{ marginTop: 10 }} />
+              <View style={{marginTop: 10}} />
             </View>
           </Modal>
 
           <Modal
             style={{
-              borderColor: "#FC3838",
-              shadowColor: "rgb(252, 56, 56)",
+              borderColor: '#FC3838',
+              shadowColor: 'rgb(252, 56, 56)',
               marginTop: 10,
               height: 95,
               width: 300,
-              backgroundColor: "white",
+              backgroundColor: 'white',
               borderRadius: 10,
-              justifyContent: "center",
-              alignItems: "center"
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
-            position={"center"}
+            position={'center'}
             x
-            ref={"featuresNotify"}
+            ref={'featuresNotify'}
             backdrop={true}
             coverScreen={true}
-            backdropPressToClose={true}
-          >
+            backdropPressToClose={true}>
             <Image
               style={{
                 height: 80,
@@ -1056,38 +1053,35 @@ export default class DashboardScreen extends Component {
                 borderRadius: 50,
                 marginTop: -30,
                 marginBottom: 20,
-                alignSelf: "center"
+                alignSelf: 'center',
                 // float : 'right'
               }}
               resizeMode="cover"
               source={Api.uri(
                 this.state.notifySenderImg
                   ? Api._base +
-                      "/media/image/" +
+                      '/media/image/' +
                       this.state.notifySenderImg +
-                      "/3"
-                  : Api._base + "/media/dpi/" + 1 + "/3"
+                      '/3'
+                  : Api._base + '/media/dpi/' + 1 + '/3',
               )}
             />
             <View>
-              <View
-                style={{ paddingLeft: 20, paddingRight: 10, marginTop: -5 }}
-              >
+              <View style={{paddingLeft: 20, paddingRight: 10, marginTop: -5}}>
                 <Text
                   style={{
                     // textAlign: "center",
                     fontSize: 12,
-                    fontWeight: "bold"
-                  }}
-                >
+                    fontWeight: 'bold',
+                  }}>
                   {this.state.notifySenderDesc}
                 </Text>
-                <Text style={{ textAlign: "center", fontSize: 12 }}>
+                <Text style={{textAlign: 'center', fontSize: 12}}>
                   {`${this.state.notificationMessage}`}
                 </Text>
               </View>
 
-              <View style={{ marginTop: 10 }} />
+              <View style={{marginTop: 10}} />
             </View>
           </Modal>
         </ScrollView>
@@ -1095,3 +1089,17 @@ export default class DashboardScreen extends Component {
     );
   }
 }
+function mapStateToProps(state, {navigation}) {
+  return {};
+}
+
+export default connect(
+  mapStateToProps,
+  {
+    addMessages,
+    setNewMessage,
+    removeTypingUser,
+    addTypingUser,
+  },
+  // mapDispatchToProps
+)(DashboardScreen);
